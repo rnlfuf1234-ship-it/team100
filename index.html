@@ -172,6 +172,16 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
 .tbl tbody tr:last-child td{border-bottom:0}
 .tbl tbody tr{cursor:pointer}
 .tbl tbody tr:hover{background:var(--bg)}
+.tbl tbody tr.sel{background:var(--accent-soft)}
+.tbl td.num{font-variant-numeric:tabular-nums;font-weight:700}
+.tbl td.hot{color:var(--accent);font-weight:900}
+.tbl td.mx{white-space:pre;text-align:center;line-height:1.35;font-size:13px}
+.tbl th.mxh{text-align:center}
+.mk-y{color:var(--ok);font-weight:900}
+.mk-n{color:var(--accent);font-weight:900}
+.mk-0{color:var(--sub)}
+.names.hot{color:var(--accent);font-weight:700}
+.namebtn{border:0;background:transparent;color:var(--fg);font-size:15px;font-weight:700;padding:0;cursor:pointer;min-height:32px;text-decoration:underline;text-underline-offset:3px}
 .tbl td b{font-size:15px}
 .rowbtn{border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;min-height:36px}
 @media (max-width:860px){
@@ -215,6 +225,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   <nav class="adm-menu" id="admMenu">
     <button type="button" data-v="a-dash">📊 대시보드</button>
     <button type="button" data-v="a-members">👥 교육생 관리</button>
+    <button type="button" data-v="a-attend">✅ 참석 현황</button>
     <button type="button" data-v="a-weeks">🗓 강의 관리</button>
     <button type="button" data-v="a-notice">📢 공지</button>
     <button type="button" data-v="a-survey">📝 설문 응답</button>
@@ -596,6 +607,29 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   </div>
 </section>
 
+<!-- ============ 관리자: 참석 현황 ============ -->
+<section id="view-a-attend" class="view">
+  <div class="pg-head"><h2 class="pg">참석 현황</h2><span class="count-pill" id="atCount"></span></div>
+  <p class="qhelp" style="margin:6px 0 0">교육생이 낸 참석 투표를 주차별로 모았어요. 표에서 주차를 누르면 아래에 이름이 나와요.</p>
+  <div class="card tblwrap">
+    <table class="tbl">
+      <thead><tr><th>주차</th><th>본강의</th><th>참석</th><th>불참</th><th>투표 안 함</th><th>보강 ①</th><th>보강 ②</th><th>기타 날짜</th><th>보강 안 감</th><th>보강 투표 안 함</th><th>실제 출석</th></tr></thead>
+      <tbody id="atBody"></tbody>
+    </table>
+  </div>
+  <h2 class="sec" id="atDetailHead">주차별 이름</h2>
+  <div class="card"><div class="chips-row" id="atChips"></div></div>
+  <div class="grid2">
+    <div class="card"><p class="qtitle sm" id="atMainHead">본강의</p><div id="atMain"></div></div>
+    <div class="card"><p class="qtitle sm" id="atMkHead">보충수업(보강)</p><div id="atMk"></div></div>
+  </div>
+  <h2 class="sec">교육생별 한눈에 보기</h2>
+  <p class="qhelp" style="margin:4px 0 0">윗줄은 본강의(○ 참석 · × 불참 · – 투표 안 함), 아랫줄은 보강에서 고른 날이에요. 이름을 누르면 그 사람 관리 화면으로 가요.</p>
+  <div class="card tblwrap">
+    <table class="tbl"><thead id="atMxHead"></thead><tbody id="atMxBody"></tbody></table>
+  </div>
+</section>
+
 <!-- ============ 관리자: 강의 관리 ============ -->
 <section id="view-a-weeks" class="view">
   <h2 class="pg">강의 관리</h2>
@@ -675,6 +709,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
 <!-- ============ 관리자: 설문 응답 ============ -->
 <section id="view-a-survey" class="view">
   <div class="pg-head"><h2 class="pg">설문 응답</h2><span class="count-pill" id="respCount"></span></div>
+  <div class="card"><p class="qtitle sm">설문 제출 현황</p><div id="respStatus"></div></div>
   <div class="grid2">
     <div class="card"><p class="qtitle sm">집중적으로 배우고 싶은 분야</p><div id="topicBars"></div></div>
     <div class="card"><p class="qtitle sm">주 멘토별 교육생</p><div id="mentorBox"></div></div>
@@ -817,7 +852,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   }
 
   // ---- 화면 전환 ----
-  var ADMIN_VIEWS=['a-dash','a-members','a-member','a-weeks','a-notice','a-survey'];
+  var ADMIN_VIEWS=['a-dash','a-members','a-member','a-attend','a-weeks','a-notice','a-survey'];
   var USER_VIEWS=['home','survey','materials','notice','account'];
   var ALL_VIEWS=['boot','login','setpw','week'].concat(USER_VIEWS,ADMIN_VIEWS);
   function hashName(){ return (location.hash||'').replace('#',''); }
@@ -900,7 +935,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     if(first && saved) fill(saved);
     refreshTodo();
     renderHome(); renderMats(); renderNotices(); renderAwSide();
-    if(me.role==='a'){ renderDash(); renderMembers(); renderSurveyAdmin(); }
+    if(me.role==='a'){ renderDash(); renderMembers(); renderAttend(); renderSurveyAdmin(); }
     route();
   }
 
@@ -1457,7 +1492,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     todo('비밀번호가 잠긴 계정', S.admin.accounts.filter(function(a){ return a.locked; }).map(function(a){ return a.id; }),'a-members');
     if(next){
       var voted={}; S.admin.votes.forEach(function(v){ if(v.week===next.w && v.main) voted[v.by]=1; });
-      todo(next.w+'주차 참석 투표 안 한 교육생', tr.filter(function(a){ return !voted[a.id]; }).map(function(a){ return a.id; }),'a-weeks');
+      todo(next.w+'주차 참석 투표 안 한 교육생', tr.filter(function(a){ return !voted[a.id]; }).map(function(a){ return a.id; }),'a-attend');
     }
     if(!S.me.changed){
       var w=el('div','free'); w.appendChild(el('b',null,'관리자 비밀번호'));
@@ -1673,9 +1708,123 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   });
 
   // ---- 관리자: 설문 응답 ----
+  // ---- 관리자: 참석 현황 (교육생이 낸 참석 투표를 주차별로) ----
+  var attendWeek=0;
+  function fmtMD(iso){ var dt=new Date(iso+'T00:00:00'); return isNaN(dt.getTime())? '' : (dt.getMonth()+1)+'/'+dt.getDate(); }
+  function copyNames(names,btn){
+    var t=names.join(', '), label=btn.textContent;
+    function ok(){ btn.textContent='복사됨 ✓'; setTimeout(function(){ btn.textContent=label; },2000); }
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(function(){ toast(t); });
+    else toast(t);
+  }
+  function nameGroup(box,title,names,opt){
+    opt=opt||{};
+    box.appendChild(el('p','grp',title+' ('+names.length+'명)'));
+    box.appendChild(el('p','names'+(opt.hot && names.length? ' hot':''), names.length? names.join(opt.lines? '\n' : ', ') : '없음'));
+    if(opt.copy && names.length){
+      var b=el('button','rowbtn','이름 복사'); b.type='button'; b.style.marginBottom='6px';
+      b.addEventListener('click',function(){ copyNames(opt.copyNames||names,b); });
+      box.appendChild(b);
+    }
+  }
+  function attendStats(n){
+    var map={}; S.admin.votes.forEach(function(v){ if(v.week===n) map[v.by]=v; });
+    var g={y:[],n:[],none:[],m1:[],m2:[],etc:[],etcNames:[],mn:[],mnone:[],att:[],map:map};
+    trainees().forEach(function(a){
+      var v=map[a.id]||{};
+      if(v.main==='y') g.y.push(a.id); else if(v.main==='n') g.n.push(a.id); else g.none.push(a.id);
+      if(v.makeup==='1' || v.makeup==='both') g.m1.push(a.id);
+      if(v.makeup==='2' || v.makeup==='both') g.m2.push(a.id);
+      if(v.makeup==='etc'){ g.etc.push(a.id+' — '+(v.note||'')); g.etcNames.push(a.id); }
+      if(v.makeup==='n') g.mn.push(a.id);
+      if(!v.makeup) g.mnone.push(a.id);
+      if(a.attend.indexOf(n)>=0) g.att.push(a.id);
+    });
+    return g;
+  }
+  function renderAttend(){
+    if(!S || !S.admin) return;
+    var tr=trainees();
+    if(!attendWeek){ var nx=nextWeek(); attendWeek=nx? nx.w : 7; }
+    $('atCount').textContent='교육생 '+tr.length+'명';
+    // 주차별 요약 표
+    var body=$('atBody'); body.textContent='';
+    for(var i=1;i<=7;i++){ (function(n){
+      var k=wk(n), g=attendStats(n), row=el('tr', n===attendWeek? 'sel':'');
+      function td(text,cls){ var c=el('td',cls||'',text); row.appendChild(c); return c; }
+      var c1=td(''); c1.appendChild(el('b',null,n+'주차')); c1.appendChild(document.createTextNode(' '+k.t));
+      td(fmtD(k.d));
+      td(String(g.y.length),'num'); td(String(g.n.length),'num'); td(String(g.none.length), g.none.length? 'num hot':'num');
+      td(k.mk[0]? fmtMD(k.mk[0])+' · '+g.m1.length+'명' : '-','num');
+      td(k.mk[1]? fmtMD(k.mk[1])+' · '+g.m2.length+'명' : '-','num');
+      td(k.mk.length? String(g.etc.length) : '-','num'); td(k.mk.length? String(g.mn.length) : '-','num');
+      td(k.mk.length? String(g.mnone.length) : '-', (k.mk.length && g.mnone.length)? 'num hot':'num');
+      td(g.att.length+'명','num');
+      row.addEventListener('click',function(){ attendWeek=n; renderAttend(); });
+      body.appendChild(row);
+    })(i); }
+    // 주차 고르기
+    var chips=$('atChips'); chips.textContent='';
+    for(var j=1;j<=7;j++){ (function(n){
+      var b=el('button','chip',n+'주차'); b.type='button';
+      b.setAttribute('aria-pressed', n===attendWeek? 'true':'false');
+      b.addEventListener('click',function(){ attendWeek=n; renderAttend(); });
+      chips.appendChild(b);
+    })(j); }
+    // 고른 주차의 이름
+    var k=wk(attendWeek), g=attendStats(attendWeek);
+    $('atDetailHead').textContent=attendWeek+'주차 · '+k.t+' — 누가 어떻게 투표했나';
+    $('atMainHead').textContent='본강의 · '+fmtD(k.d);
+    var mb=$('atMain'); mb.textContent='';
+    nameGroup(mb,'아직 투표 안 함',g.none,{hot:true,copy:true});
+    nameGroup(mb,'참석',g.y);
+    nameGroup(mb,'불참',g.n);
+    nameGroup(mb,'실제 출석 (교육생 관리에서 표시한 것)',g.att);
+    $('atMkHead').textContent='보충수업(보강)'+(k.makeup? ' · '+k.makeup : '');
+    var kb=$('atMk'); kb.textContent='';
+    if(!k.mk.length) kb.appendChild(el('p','empty','이 주차에는 보강 날짜가 없어요.'));
+    else{
+      nameGroup(kb,'아직 투표 안 함',g.mnone,{hot:true,copy:true});
+      nameGroup(kb,fmtD(k.mk[0])+' 가능',g.m1);
+      if(k.mk[1]) nameGroup(kb,fmtD(k.mk[1])+' 가능',g.m2);
+      nameGroup(kb,'기타 날짜를 적은 사람',g.etc,{lines:true});
+      nameGroup(kb,'보강 안 감',g.mn);
+    }
+    // 교육생 × 주차 표
+    var hr=el('tr'); hr.appendChild(el('th',null,'이름'));
+    for(var w=1;w<=7;w++){ var th=el('th','mxh',w+'주 ('+fmtMD(wk(w).d)+')'); hr.appendChild(th); }
+    hr.appendChild(el('th','mxh','설문'));
+    var mh=$('atMxHead'); mh.textContent=''; mh.appendChild(hr);
+    var stats=[]; for(var s=1;s<=7;s++) stats[s]=attendStats(s);
+    var xb=$('atMxBody'); xb.textContent='';
+    tr.forEach(function(a){
+      var row=el('tr'); row.style.cursor='default';
+      var c0=el('td'), nb=el('button','namebtn',a.id); nb.type='button';
+      nb.addEventListener('click',function(){ openMember(a.id); });
+      c0.appendChild(nb); row.appendChild(c0);
+      for(var w=1;w<=7;w++){
+        var v=stats[w].map[a.id]||{}, kk=wk(w), cell=el('td','mx');
+        cell.appendChild(el('span', v.main==='y'? 'mk-y' : (v.main==='n'? 'mk-n':'mk-0'), v.main==='y'? '○' : (v.main==='n'? '×':'–')));
+        var mkTxt = !kk.mk.length? '' : (v.makeup==='1'? fmtMD(kk.mk[0]) : v.makeup==='2'? fmtMD(kk.mk[1]||'') : v.makeup==='both'? '둘 다' : v.makeup==='etc'? '기타' : v.makeup==='n'? '안 감' : '–');
+        cell.appendChild(document.createTextNode('\n'));
+        cell.appendChild(el('span', v.makeup? '' : 'mk-0', mkTxt));
+        if(v.makeup==='etc' && v.note) cell.title=v.note;
+        row.appendChild(cell);
+      }
+      var cs=el('td','mx'); cs.appendChild(respOf(a.id)? pill('ok','제출') : pill('no','미제출')); row.appendChild(cs);
+      xb.appendChild(row);
+    });
+    if(!tr.length){ var er=el('tr'), ec=el('td',null,'교육생이 없어요.'); ec.colSpan=9; er.appendChild(ec); xb.appendChild(er); }
+  }
+
   function renderSurveyAdmin(){
     var resp=S.admin.responses.slice().sort(function(a,b){return (b.updatedAt||'').localeCompare(a.updatedAt||'')});
-    $('respCount').textContent='응답 '+resp.length+'명';
+    var trs=trainees(), gotN=trs.filter(function(a){ return !!respOf(a.id); }).map(function(a){ return a.id; }),
+        notN=trs.filter(function(a){ return !respOf(a.id); }).map(function(a){ return a.id; });
+    $('respCount').textContent='교육생 '+trs.length+'명 중 '+gotN.length+'명 제출';
+    var st=$('respStatus'); st.textContent='';
+    nameGroup(st,'아직 설문을 안 낸 교육생',notN,{hot:true,copy:true});
+    nameGroup(st,'설문을 낸 교육생',gotN);
     renderBars($('topicBars'),resp);
     var mb=$('mentorBox'); mb.textContent='';
     Object.keys(MENTORS).forEach(function(name){
@@ -1711,4 +1860,4 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   }else route();
 })();
 </script>
-<!-- build:20261124123004 --></body></html>
+<!-- build:20261124131012 --></body></html>
