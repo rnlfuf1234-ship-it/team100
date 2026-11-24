@@ -139,6 +139,14 @@ textarea{min-height:96px;resize:vertical}
 .pill.no{background:var(--bg);color:var(--sub);border:1px solid var(--line)}
 .pill.bad{background:var(--accent-soft);color:var(--accent)}
 .names{font-size:14px;margin:2px 0 10px;word-break:keep-all;white-space:pre-wrap}
+.vt-state{font-size:14px;font-weight:700;margin:14px 0 0;padding:10px 12px;border-radius:10px;background:var(--bg);color:var(--sub)}
+.vt-state.dirty{background:var(--accent-soft);color:var(--accent)}
+.vt-state.saved{background:var(--ok-soft);color:var(--ok)}
+.pop{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px}
+.pop-card{background:var(--card);color:var(--fg);border-radius:16px;padding:26px 20px 20px;width:100%;max-width:360px;box-sizing:border-box;text-align:center}
+.pop-icon{font-size:44px;line-height:1;margin:0}
+.pop-card h3{font-size:20px;font-weight:900;margin:12px 0 6px}
+#popBody{font-size:15px;color:var(--sub);margin:0;white-space:pre-wrap;word-break:keep-all}
 
 /* ---- 관리자 콘솔 ---- */
 .adm-side{position:fixed;left:0;top:0;bottom:0;width:224px;background:var(--side);color:var(--side-fg);display:flex;flex-direction:column;
@@ -184,6 +192,15 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
 
 <div id="busy" hidden>불러오는 중…</div>
 <div id="toast" hidden></div>
+<div id="popup" class="pop" hidden>
+  <div class="pop-card" role="dialog" aria-modal="true" aria-labelledby="popTitle">
+    <p class="pop-icon" id="popIcon">✅</p>
+    <h3 id="popTitle"></h3>
+    <p id="popBody"></p>
+    <button type="button" class="btn" id="popOk">확인</button>
+    <button type="button" class="btn sub" id="popAlt" hidden></button>
+  </div>
+</div>
 
 <div class="topbar" id="topbar"><div class="topbar-in">
   <div class="brand">팀100컨설팅<span class="gen">1기</span><small>playup partners</small></div>
@@ -303,12 +320,12 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
       <div id="vtEtcBox" hidden>
         <label class="lbl" for="vtEtcText">올 수 있는 다른 날짜를 적어 주세요</label>
         <input type="text" id="vtEtcText" maxlength="100" placeholder="예) 12월 5일(토) 저녁, 12월 7일(월) 오후">
-        <button type="button" class="btn sub" id="vtEtcBtn">이 날짜로 저장</button>
-        <p class="okmsg" id="vtEtcSaved" style="display:block" hidden></p>
       </div>
       <p class="qhelp" id="vtMkCnt" style="margin:6px 0 0"></p>
     </div>
+    <p class="vt-state" id="vtState"></p>
     <p class="err" id="vtErr"></p>
+    <button type="button" class="btn" id="vtSaveBtn" style="margin-top:10px" disabled>투표 저장하기</button>
   </div>
   <div class="card">
     <p class="qtitle sm">수업 내용</p>
@@ -456,6 +473,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     <button type="button" class="btn sub" id="copyBtn">내용 복사하기</button>
   </div>
   <button type="button" class="btn sub" id="editBtn">답을 고치고 싶어요</button>
+  <button type="button" class="btn" id="doneHomeBtn" style="margin-top:10px">완료하기</button>
 </div>
 </section>
 
@@ -698,7 +716,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   // ---- 서버와 이야기하기 ----
   function setBusy(d){ busyN+=d; $('busy').hidden=busyN<=0; }
   function setToken(t){ token=t; try{ if(t) localStorage.setItem('team100_token',t); else localStorage.removeItem('team100_token'); }catch(e){} }
-  function clearSession(){ setToken(null); S=null; me=null; saved=null; loginHash=null; surveyDone=false; try{ localStorage.removeItem('team100_snap'); }catch(e){} }
+  function clearSession(){ setToken(null); S=null; me=null; saved=null; loginHash=null; surveyDone=false; voteDraft=null; try{ localStorage.removeItem('team100_snap'); }catch(e){} }
   async function api(req){
     if(token && req.action!=='login') req.token=token;
     setBusy(1);
@@ -846,7 +864,18 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     var key=v+(v==='week'? curWeek():'')+(v==='a-member'? adminMember:'');
     if(key!==lastKey){ lastKey=key; window.scrollTo(0,0); }
   }
-  function go(h){ if(hashName()!==h) location.hash=h; route(); }
+  function reallyGo(h){ if(hashName()!==h) location.hash=h; route(); }
+  function go(h){
+    var n=curWeek();
+    if(me && n && h!=='w'+n && curView()==='week' && voteDirty(n)){   // 투표를 고르기만 하고 저장 안 한 채 나가려 할 때
+      showPopup({icon:'📝', title:'투표를 아직 저장하지 않았어요', body:'저장하지 않고 나가면 고른 내용이 사라져요.',
+        ok:'저장하고 나가기', alt:'저장하지 않고 나가기',
+        onOk:function(){ saveVote(function(){ reallyGo(h); }); },
+        onAlt:function(){ voteDraft=null; reallyGo(h); }});
+      return;
+    }
+    reallyGo(h);
+  }
   window.addEventListener('hashchange',route);
   document.querySelectorAll('.nav button, .adm-side button[data-v]').forEach(function(b){
     b.addEventListener('click',function(){ go(b.getAttribute('data-v')); });
@@ -1070,44 +1099,47 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     renderVote(n);
     renderComments(n);
   }
-  var etcWeek=0;   // "기타 날짜 쓰기" 칸을 열어 둔 주차 (0 = 닫힘)
+  // 참석 투표는 고른 뒤 "투표 저장하기"를 눌러야 저장된다. 저장 전 선택은 voteDraft에 둔다.
+  var voteDraft=null;   // {week, main, makeup, note}
   function myVote(n){ var m=(S && S.votes.mine[String(n)])||{}; return {main:m.main||'', makeup:m.makeup||'', note:m.note||''}; }
-  function sendVote(n,v){
-    var key=String(n), prev=S.votes.mine[key];
-    S.votes.mine[key]=v;                            // 누르자마자 화면에 먼저 반영하고, 서버 저장은 뒤에서
-    hideMsg('vtErr'); renderVote(n); renderHome();
-    api({action:'vote',week:n,main:v.main,makeup:v.makeup,note:v.note||''}).then(function(res){
-      if(res.ok){ applyData(res.data,false); return; }
-      if(!S) return;
-      if(prev) S.votes.mine[key]=prev; else delete S.votes.mine[key];
-      renderVote(n); renderHome(); showMsg('vtErr','투표가 저장되지 않았어요. '+errText(res));
-    });
+  function draftFor(n){
+    if(!voteDraft || voteDraft.week!==n){ var m=myVote(n); voteDraft={week:n, main:m.main, makeup:m.makeup, note:m.note}; }
+    return voteDraft;
+  }
+  function voteDirty(n){
+    if(!n || !S || !voteDraft || voteDraft.week!==n) return false;
+    var d=voteDraft, m=myVote(n);
+    return d.main!==m.main || d.makeup!==m.makeup || (d.makeup==='etc' && d.note.trim()!==m.note);
+  }
+  function voteSummary(v,k){
+    var parts=[];
+    if(v.main==='y') parts.push('본강의 참석'); else if(v.main==='n') parts.push('본강의 불참');
+    if(v.makeup==='1') parts.push('보강 '+fmtD(k.mk[0]||''));
+    else if(v.makeup==='2') parts.push('보강 '+fmtD(k.mk[1]||''));
+    else if(v.makeup==='both') parts.push('보강 둘 다 가능');
+    else if(v.makeup==='etc') parts.push('보강 기타 날짜: '+(v.note||''));
+    else if(v.makeup==='n') parts.push('보강 안 감');
+    return parts.join(' · ');
   }
   function renderVote(n){
-    if(etcWeek && etcWeek!==n) etcWeek=0;
-    var k=wk(n), mine=myVote(n), c=S.votes.counts[String(n)]||{};
+    var k=wk(n), d=draftFor(n), c=S.votes.counts[String(n)]||{};
     function cnt(x){ return c[x]||0; }
     function chips(box,opts,cur,field){
       box.textContent='';
       opts.forEach(function(o){
         var b=el('button','chip',o[1]); b.type='button';
-        b.setAttribute('aria-pressed', (cur===o[0] || (o[0]==='etc' && etcWeek===n))? 'true':'false');
+        b.setAttribute('aria-pressed', cur===o[0]? 'true':'false');
         b.addEventListener('click',function(){
-          if(field==='makeup' && o[0]==='etc'){
-            if(etcWeek===n){ etcWeek=0; renderVote(n); return; }                              // 열어만 둔 칸 닫기
-            if(cur!=='etc'){ etcWeek=n; renderVote(n); $('vtEtcText').focus(); return; }      // 칸 열기 (저장은 아래 버튼으로)
-          }
-          etcWeek=0;
-          var v=myVote(n);
-          v[field]=(cur===o[0])? '' : o[0];
-          if(field==='makeup') v.note='';
-          sendVote(n,v);
+          d[field]=(cur===o[0])? '' : o[0];
+          if(field==='makeup' && d.makeup!=='etc') d.note='';
+          hideMsg('vtErr'); renderVote(n);
+          if(field==='makeup' && d.makeup==='etc') $('vtEtcText').focus();
         });
         box.appendChild(b);
       });
     }
     $('vtMainLbl').textContent='본강의 · '+fmtD(k.d)+' 오후 1~6시';
-    chips($('vtMain'),[['y','참석해요'],['n','못 가요']],mine.main,'main');
+    chips($('vtMain'),[['y','참석해요'],['n','못 가요']],d.main,'main');
     $('vtMainCnt').textContent='지금까지 참석 '+cnt('y')+'명 · 불참 '+cnt('n')+'명';
     $('vtMkBox').hidden=!k.mk.length;
     if(k.mk.length){
@@ -1116,25 +1148,51 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
       if(k.mk[1]){ opts.push(['2',fmtD(k.mk[1])]); opts.push(['both','둘 다 가능']); }
       opts.push(['etc','기타 날짜 쓰기']);
       opts.push(['n','보강은 안 가요']);
-      chips($('vtMk'),opts,mine.makeup,'makeup');
-      var showEtc=(mine.makeup==='etc' || etcWeek===n);
-      $('vtEtcBox').hidden=!showEtc;
-      if(showEtc && document.activeElement!==$('vtEtcText')) $('vtEtcText').value=mine.note;
-      $('vtEtcSaved').hidden=!(mine.makeup==='etc' && mine.note);
-      $('vtEtcSaved').textContent='내가 적은 날짜: '+mine.note;
+      chips($('vtMk'),opts,d.makeup,'makeup');
+      $('vtEtcBox').hidden=d.makeup!=='etc';
+      if(d.makeup==='etc' && document.activeElement!==$('vtEtcText')) $('vtEtcText').value=d.note;
       $('vtMkCnt').textContent=fmtD(k.mk[0])+' '+cnt('m1')+'명'+(k.mk[1]? ' · '+fmtD(k.mk[1])+' '+cnt('m2')+'명' : '')+' · 기타 날짜 '+cnt('me')+'명 · 안 감 '+cnt('mn')+'명';
-    }
+    }else $('vtEtcBox').hidden=true;
+    renderVoteState(n);
   }
-  function saveEtcVote(){
-    var n=curWeek(), text=$('vtEtcText').value.trim();
+  function renderVoteState(n){
+    var m=myVote(n), dirty=voteDirty(n), st=$('vtState');
+    $('vtSaveBtn').disabled=!dirty;
+    if(dirty){ st.className='vt-state dirty'; st.textContent='아직 저장 전이에요. 아래 "투표 저장하기"를 눌러 주세요.'; }
+    else if(m.main || m.makeup){ st.className='vt-state saved'; st.textContent='✅ 저장됨 — '+voteSummary(m,wk(n)); }
+    else { st.className='vt-state'; st.textContent='위에서 고른 뒤 "투표 저장하기"를 눌러 주세요.'; }
+  }
+  function saveVote(after){
+    var n=curWeek();
     if(!n || !S) return;
-    if(!text){ showMsg('vtErr','가능한 날짜를 적어 주세요.'); return; }
-    var v=myVote(n); v.makeup='etc'; v.note=text.slice(0,100);
-    etcWeek=0; $('vtEtcText').blur();
-    sendVote(n,v);
+    var d=draftFor(n), v={main:d.main, makeup:d.makeup, note:d.makeup==='etc'? d.note.trim().slice(0,100) : ''};
+    hideMsg('vtErr');
+    if(v.makeup==='etc' && !v.note){ showMsg('vtErr','"기타 날짜 쓰기"를 고르셨어요. 가능한 날짜를 적어 주세요.'); $('vtEtcText').focus(); return; }
+    var btn=$('vtSaveBtn'); btn.disabled=true; btn.textContent='저장 중...';
+    api({action:'vote',week:n,main:v.main,makeup:v.makeup,note:v.note}).then(function(res){
+      btn.textContent='투표 저장하기';
+      if(!res.ok){ if(S) renderVoteState(n); showMsg('vtErr','투표가 저장되지 않았어요. '+errText(res)); return; }
+      voteDraft=null; applyData(res.data,false);
+      if(after){ after(); return; }
+      showPopup({icon:'✅', title:'투표가 저장됐어요', body:(voteSummary(v,wk(n))||'고른 것을 모두 지웠어요.')+'\n\n바뀌면 언제든 다시 고르고 저장할 수 있어요.', ok:'확인'});
+    });
   }
-  $('vtEtcBtn').addEventListener('click',saveEtcVote);
-  $('vtEtcText').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); saveEtcVote(); } });
+  $('vtSaveBtn').addEventListener('click',function(){ saveVote(null); });
+  $('vtEtcText').addEventListener('input',function(){ var n=curWeek(); if(!n || !S) return; draftFor(n).note=this.value; renderVoteState(n); });
+  $('vtEtcText').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); saveVote(null); } });
+
+  // ---- 확인 창(팝업) ----
+  var popOkFn=null, popAltFn=null;
+  function showPopup(o){
+    $('popIcon').textContent=o.icon||'✅'; $('popTitle').textContent=o.title||''; $('popBody').textContent=o.body||'';
+    $('popOk').textContent=o.ok||'확인';
+    $('popAlt').hidden=!o.alt; $('popAlt').textContent=o.alt||'';
+    popOkFn=o.onOk||null; popAltFn=o.onAlt||null;
+    $('popup').hidden=false; $('popOk').focus();
+  }
+  function closePopup(fn){ $('popup').hidden=true; popOkFn=null; popAltFn=null; if(fn) fn(); }
+  $('popOk').addEventListener('click',function(){ closePopup(popOkFn); });
+  $('popAlt').addEventListener('click',function(){ closePopup(popAltFn); });
   function renderComments(n){
     var list=$('cmList'); list.textContent='';
     var rows=S.comments.filter(function(c){ return c.week===n; }).sort(function(a,b){ return (a.at||'').localeCompare(b.at||''); });
@@ -1153,7 +1211,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     hideMsg('cmErr');
     if(!n) return;
     if(!text){ showMsg('cmErr','내용을 적어 주세요.'); return; }
-    act({action:'addComment',week:n,text:text},{err:'cmErr',btn:$('cmBtn')}).then(function(res){ if(res) $('cmText').value=''; });
+    act({action:'addComment',week:n,text:text},{err:'cmErr',btn:$('cmBtn')}).then(function(res){ if(res){ $('cmText').value=''; toast('댓글을 남겼어요.'); } });
   });
 
   // ---- 설문 ----
@@ -1271,6 +1329,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     }else selectBox();
   });
   $('editBtn').addEventListener('click',function(){ surveyDone=false; route(); window.scrollTo(0,0); });
+  $('doneHomeBtn').addEventListener('click',function(){ go('home'); });
   function fill(d){
     function setChip(id,vals){
       document.querySelectorAll('#'+id+' .chip').forEach(function(b){ b.setAttribute('aria-pressed', vals.indexOf(chipText(b))>=0 ? 'true':'false'); });
@@ -1652,4 +1711,4 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   }else route();
 })();
 </script>
-</body></html>
+<!-- build:20261124123004 --></body></html>
