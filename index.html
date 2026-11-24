@@ -1,0 +1,1543 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>팀100컨설팅</title>
+<meta name="description" content="팀100컨설팅 1기 교육생 플랫폼">
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><script src="config.js"></script><style>
+/* 교육생 화면: 모바일 375 기준, 위 브랜드 바 + 아래 탭.  관리자 화면: 어두운 옆 메뉴 + 넓은 표(SaaS 콘솔). */
+:root{
+  --bg:#faf8f7; --card:#ffffff; --fg:#1d1b1a; --sub:#6d6763; --line:#e8e2de;
+  --accent:#E60039; --accent-soft:#fdeef2; --ok:#1a7f4e; --ok-soft:#e6f4ec; --nav-bg:#ffffff;
+  --brand:#E60039; --brand-deep:#c40030; --on-brand:#ffffff;
+  --side:#171719; --side-fg:#eceae8; --side-sub:#9f9994; --side-hover:#26262a; --side-line:#2e2e33;
+  --font:'Noto Sans KR',-apple-system,'Malgun Gothic',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#131314; --card:#1f1f22; --fg:#f2f0ee; --sub:#a39d98; --line:#343237;
+    --accent:#ff5c85; --accent-soft:#3a2229; --ok:#4cc98a; --ok-soft:#1d3327; --nav-bg:#1a1a1d;
+    color-scheme:dark;
+  }
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);margin:0;font-size:16px;line-height:1.6}
+button,input,textarea,select{font-family:var(--font)}
+#busy{position:fixed;top:calc(env(safe-area-inset-top,0px) + 62px);left:50%;transform:translateX(-50%);z-index:60;
+  background:var(--fg);color:var(--bg);border-radius:999px;font-size:13px;font-weight:700;padding:6px 14px}
+#toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 76px);left:50%;transform:translateX(-50%);z-index:60;
+  background:var(--fg);color:var(--bg);border-radius:10px;font-size:14px;font-weight:700;padding:10px 16px;max-width:86vw;text-align:center}
+.topbar{position:sticky;top:0;z-index:30;background:var(--brand);color:var(--on-brand);padding-top:env(safe-area-inset-top,0px)}
+.topbar-in{max-width:560px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:54px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{font-size:16px;font-weight:900;white-space:nowrap}
+.brand small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.1em;opacity:.85;line-height:1.2}
+.gen{display:inline-block;background:var(--on-brand);color:var(--brand);border-radius:6px;font-size:12px;font-weight:900;padding:0 7px;margin-left:4px;vertical-align:1px}
+.tb-btns{display:flex;gap:6px}
+.tbbtn{border:1.5px solid rgba(255,255,255,.55);background:transparent;color:var(--on-brand);border-radius:8px;
+  padding:8px 10px;font-size:13px;font-weight:700;cursor:pointer;min-height:40px;white-space:nowrap}
+.wrap{max-width:560px;margin:0 auto;padding-block:4px 110px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--nav-bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:560px;margin:0 auto;display:flex;padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+.nav button{flex:1;border:0;background:transparent;color:var(--sub);font-size:12.5px;font-weight:700;padding:8px 2px 10px;cursor:pointer;min-height:56px;line-height:1.25}
+.nav button .ic{display:block;font-size:20px;line-height:1.3}
+.nav button[aria-current="true"]{color:var(--accent)}
+.view{display:none}
+.view.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 18px;margin-top:16px}
+h2.sec{font-size:19px;font-weight:900;margin:22px 0 0}
+h2.pg{font-size:23px;font-weight:900;margin:20px 0 0}
+.pg-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.qnum{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;border-radius:6px;padding:2px 8px;margin-bottom:8px}
+.qtitle{font-size:17px;font-weight:700;margin:0 0 4px;line-height:1.4}
+.qtitle.sm{font-size:15px;margin-bottom:8px}
+.qhelp{font-size:13.5px;color:var(--sub);margin:0 0 12px}
+.lbl{display:block;font-size:13.5px;font-weight:700;color:var(--sub);margin:12px 0 4px}
+.chips,.chips-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:10px 16px;font-size:15px;cursor:pointer;min-height:44px}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:700}
+.chip:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+input[type=text],input[type=password],input[type=date],input[type=tel],textarea,select{width:100%;box-sizing:border-box;
+  border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font-size:16px;padding:12px;min-height:48px}
+textarea{min-height:96px;resize:vertical}
+.btn{display:block;width:100%;border:0;border-radius:12px;background:var(--brand);color:var(--on-brand);font-size:18px;font-weight:700;padding:16px;margin-top:22px;cursor:pointer;min-height:52px}
+.btn.sub{background:var(--card);color:var(--fg);border:1.5px solid var(--line);font-size:15px;padding:12px;margin-top:10px}
+.btn.inline{display:inline-block;width:auto;padding:12px 18px}
+.btn:disabled,.chip:disabled{opacity:.5;cursor:default}
+.err{color:var(--accent);font-size:14px;font-weight:700;margin-top:8px;display:none}
+.okmsg{color:var(--ok);font-size:14px;font-weight:700;margin-top:8px;display:none}
+.warn{background:var(--accent-soft);color:var(--accent);border-radius:10px;padding:12px;font-size:14px;font-weight:700;margin-top:16px;white-space:pre-wrap}
+.badge-ex{font-size:12px;color:var(--sub)}
+.login{text-align:center;padding:32px 20px;margin-top:28px}
+.login h1{font-size:26px;font-weight:900;margin:6px 0 8px}
+.login .lbl,.login input{text-align:left}
+.login-gen{display:inline-block;background:var(--brand);color:var(--on-brand);border-radius:999px;font-size:13px;font-weight:900;padding:2px 14px;margin:0}
+.done{text-align:center;padding:44px 18px}
+.done .big{font-size:52px;line-height:1}
+.done h2{font-size:22px;font-weight:900;margin:14px 0 8px}
+.done p{color:var(--sub);font-size:15px;margin:0}
+.copybox{white-space:pre-wrap;font-size:13.5px;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:12px;text-align:left;margin-top:16px;user-select:all}
+.home-hero{background:var(--brand);color:var(--on-brand);border-radius:14px;padding:22px 18px;margin-top:16px}
+.home-hero h1{font-size:22px;font-weight:900;margin:8px 0 6px;line-height:1.3;text-wrap:balance}
+.home-hero p{font-size:14px;margin:0;opacity:.95}
+.hero-gen{display:inline-block;background:var(--on-brand);color:var(--brand);border-radius:999px;font-size:13px;font-weight:900;padding:1px 12px}
+.todo{display:flex;align-items:center;gap:12px}
+.todo .dot{font-size:26px}
+.todo .tx{min-width:0;flex:1}
+.todo b{font-size:16px}
+.todo p{margin:2px 0 0;font-size:13.5px;color:var(--sub)}
+.todo .go{border:0;background:var(--brand);color:var(--on-brand);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px;white-space:nowrap}
+.week{display:flex;gap:12px;width:100%;box-sizing:border-box;border:0;border-top:1px solid var(--line);background:transparent;
+  padding:12px 0;font-size:14px;text-align:left;color:var(--fg);cursor:pointer;align-items:center}
+.week:first-child{border-top:0}
+.week .wn{flex:0 0 44px;height:44px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-weight:900;display:flex;align-items:center;justify-content:center;font-size:15px}
+.week.past .wn{background:var(--bg);color:var(--sub)}
+.week .wt{min-width:0;flex:1}
+.week .wt b{display:block;font-size:14.5px}
+.week .wt span{color:var(--sub);font-size:13px}
+.dday{font-size:12.5px;font-weight:700;color:var(--accent);white-space:nowrap}
+.week.past .dday{color:var(--sub)}
+.trow{display:flex;gap:12px;border-top:1px solid var(--line);padding:10px 0;font-size:14.5px}
+.trow:first-child{border-top:0}
+.ttime{flex:0 0 104px;color:var(--sub);font-size:13px;font-weight:700}
+.ttext{min-width:0}
+.extra{margin-top:10px;background:var(--bg);border-radius:8px;padding:10px;font-size:14px}
+.extra b{color:var(--sub);font-size:12.5px;display:block}
+.count-pill{background:var(--brand);color:var(--on-brand);border-radius:999px;font-size:13px;font-weight:700;padding:3px 10px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:14px}
+.bar-label{flex:0 0 150px;min-width:0}
+.bar-track{flex:1;height:14px;background:var(--bg);border-radius:7px;overflow:hidden}
+.bar-fill{height:100%;background:var(--accent);border-radius:7px}
+.bar-n{flex:0 0 2.2em;text-align:right;font-variant-numeric:tabular-nums;color:var(--sub)}
+.resp{border-top:1px solid var(--line);padding:14px 0}
+.resp:first-child{border-top:0}
+.resp .name{font-weight:900;font-size:16px}
+.resp .meta{color:var(--sub);font-size:13.5px;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:700;border-radius:6px;padding:2px 8px}
+.free{font-size:14px;margin-top:8px;background:var(--bg);border-radius:8px;padding:10px;white-space:pre-wrap;word-break:break-word}
+.free b{color:var(--sub);font-weight:700;font-size:12.5px;display:block}
+.mat-row{display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);padding:12px 0;min-width:0}
+.mat-row:first-child{border-top:0}
+.mat-row a,.mat-link{color:var(--accent);font-weight:700;text-decoration:none;font-size:15px;word-break:break-all;min-width:0;
+  background:transparent;border:0;padding:0;text-align:left;cursor:pointer;min-height:32px}
+.mat-size{color:var(--sub);font-size:12.5px;white-space:nowrap}
+.mat-del{margin-left:auto;border:1.5px solid var(--line);background:var(--card);color:var(--sub);border-radius:8px;padding:8px 10px;font-size:13px;cursor:pointer;white-space:nowrap;min-height:40px}
+.grp{font-size:13.5px;font-weight:900;color:var(--sub);margin:16px 0 2px}
+.grp:first-child{margin-top:0}
+.nt,.cm{border-top:1px solid var(--line);padding:14px 0}
+.nt:first-child,.cm:first-child{border-top:0}
+.nt b{font-size:15.5px}
+.ntd{color:var(--sub);font-size:12.5px;margin-left:6px}
+.nt p,.cm p{margin:6px 0 0;font-size:14.5px;white-space:pre-wrap;word-break:break-word}
+.nt .mat-del,.cm .mat-del{margin-top:8px}
+.note{font-size:13.5px;color:var(--sub);text-align:center;margin-top:24px}
+.empty{font-size:13.5px;color:var(--sub);margin:0}
+.pill{display:inline-block;border-radius:999px;font-size:12px;font-weight:700;padding:2px 9px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.no{background:var(--bg);color:var(--sub);border:1px solid var(--line)}
+.pill.bad{background:var(--accent-soft);color:var(--accent)}
+.names{font-size:14px;margin:2px 0 10px;word-break:keep-all}
+
+/* ---- 관리자 콘솔 ---- */
+.adm-side{position:fixed;left:0;top:0;bottom:0;width:224px;background:var(--side);color:var(--side-fg);display:flex;flex-direction:column;
+  padding:18px 12px;box-sizing:border-box;z-index:35;overflow-y:auto}
+.adm-brand{font-weight:900;font-size:17px;padding:4px 8px 16px;white-space:nowrap}
+.adm-brand small{display:block;font-size:11px;color:var(--side-sub);font-weight:700;margin-top:2px}
+.adm-menu,.adm-foot{display:flex;flex-direction:column;gap:2px}
+.adm-foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--side-line)}
+.adm-side button{border:0;background:transparent;color:var(--side-fg);text-align:left;font-size:14.5px;font-weight:500;padding:11px 10px;border-radius:8px;cursor:pointer;min-height:44px;white-space:nowrap}
+.adm-side button:hover{background:var(--side-hover)}
+.adm-side button[aria-current="true"]{background:var(--brand);color:var(--on-brand);font-weight:700}
+body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28px 60px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.kpi b{display:block;font-size:26px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.3}
+.kpi span{font-size:13px;color:var(--sub)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid2>.card{min-width:0}
+.tblwrap{overflow-x:auto;padding:0}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:680px}
+.tbl th{text-align:left;font-size:12.5px;color:var(--sub);font-weight:700;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover{background:var(--bg)}
+.tbl td b{font-size:15px}
+.rowbtn{border:1.5px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;min-height:36px}
+@media (max-width:860px){
+  .adm-side{position:sticky;top:0;bottom:auto;width:auto;flex-direction:row;align-items:center;padding:8px;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+  .adm-side::-webkit-scrollbar{display:none}
+  .adm-brand{padding:0 8px;font-size:15px}
+  .adm-brand small{display:none}
+  .adm-menu,.adm-foot{flex-direction:row}
+  .adm-foot{margin-top:0;border-top:0;padding-top:0;border-left:1px solid var(--side-line);padding-left:6px;margin-left:4px}
+  body.adm .wrap{margin-left:0;padding:8px 16px 60px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr;gap:0}
+}
+@media (prefers-reduced-motion: no-preference){
+  .chip,.nav button{transition:background .15s,border-color .15s,color .15s}
+}
+</style>
+
+<div id="busy" hidden>불러오는 중…</div>
+<div id="toast" hidden></div>
+
+<div class="topbar" id="topbar"><div class="topbar-in">
+  <div class="brand">팀100컨설팅<span class="gen">1기</span><small>playup partners</small></div>
+  <div class="tb-btns">
+    <button type="button" class="tbbtn" id="adminOpenBtn" hidden>관리자 화면</button>
+    <button type="button" class="tbbtn" id="accountBtn" hidden>내 정보</button>
+  </div>
+</div></div>
+
+<aside class="adm-side" id="admSide" hidden>
+  <div class="adm-brand">팀100컨설팅<span class="gen">1기</span><small>관리자 · playup partners</small></div>
+  <nav class="adm-menu" id="admMenu">
+    <button type="button" data-v="a-dash">📊 대시보드</button>
+    <button type="button" data-v="a-members">👥 교육생 관리</button>
+    <button type="button" data-v="a-weeks">🗓 강의 관리</button>
+    <button type="button" data-v="a-notice">📢 공지</button>
+    <button type="button" data-v="a-survey">📝 설문 응답</button>
+  </nav>
+  <div class="adm-foot">
+    <button type="button" data-v="home">📱 교육생 화면 보기</button>
+    <button type="button" data-v="account">🔑 내 비밀번호</button>
+    <button type="button" id="admLogout">↩ 로그아웃</button>
+  </div>
+</aside>
+
+<div class="wrap">
+
+<!-- ============ 불러오는 중 ============ -->
+<section id="view-boot" class="view">
+  <div class="card login">
+    <p class="qhelp" id="bootMsg" style="margin:0">불러오는 중이에요…</p>
+    <button type="button" class="btn sub" id="bootRetry" hidden>다시 시도</button>
+  </div>
+</section>
+
+<!-- ============ 로그인 ============ -->
+<section id="view-login" class="view on">
+  <div class="card login">
+    <p class="login-gen">1기</p>
+    <h1>팀100컨설팅</h1>
+    <div class="chips-row" style="justify-content:center;margin:12px 0 10px">
+      <button type="button" class="chip" id="tabUser" aria-pressed="true">교육생 로그인</button>
+      <button type="button" class="chip" id="tabAdmin" aria-pressed="false">관리자 로그인</button>
+    </div>
+    <p class="qhelp" id="loginHelp">아이디는 본인 이름이에요. 처음이면 운영진에게 받은 비밀번호를 적어 주세요.</p>
+    <form id="loginForm" novalidate>
+      <label class="lbl" for="loginId" id="loginIdLbl">아이디 (이름)</label>
+      <input type="text" id="loginId" autocomplete="username" placeholder="예) 홍길동">
+      <label class="lbl" for="loginPw">비밀번호</label>
+      <input type="password" id="loginPw" autocomplete="current-password" placeholder="비밀번호">
+      <p class="err" id="loginErr"></p>
+      <button type="submit" class="btn" id="loginBtn">로그인</button>
+    </form>
+  </div>
+</section>
+
+<!-- ============ 처음 로그인: 비밀번호 정하기 ============ -->
+<section id="view-setpw" class="view">
+  <div class="card login">
+    <p class="login-gen">처음 오셨네요</p>
+    <h1 style="font-size:22px">내 비밀번호를 정해 주세요</h1>
+    <p class="qhelp">받은 비밀번호 대신, 앞으로 쓸 나만의 비밀번호를 정해요.</p>
+    <form id="spForm" novalidate>
+      <div id="spOldBox" hidden>
+        <label class="lbl" for="spOld">받은 비밀번호</label>
+        <input type="password" id="spOld" autocomplete="current-password">
+      </div>
+      <label class="lbl" for="spNew">새 비밀번호 (6자 이상)</label>
+      <input type="password" id="spNew" autocomplete="new-password">
+      <label class="lbl" for="spNew2">새 비밀번호 한 번 더</label>
+      <input type="password" id="spNew2" autocomplete="new-password">
+      <p class="err" id="spErr"></p>
+      <button type="submit" class="btn" id="spBtn">이 비밀번호로 정하기</button>
+    </form>
+    <button type="button" class="btn sub" id="spLogout">다른 사람으로 로그인</button>
+  </div>
+</section>
+
+<!-- ============ 홈 ============ -->
+<section id="view-home" class="view">
+  <div class="home-hero">
+    <span class="hero-gen">1기</span>
+    <h1 id="helloName">반갑습니다</h1>
+    <p>2026.11.28 ~ 2027.01.09 · 토요일 오후 1~6시 · 7주 과정</p>
+  </div>
+  <div class="card todo" id="todoSurvey">
+    <span class="dot">📝</span>
+    <div class="tx"><b>사전 설문</b><p id="todoSurveyMsg">시작 전에 2~3분만 내주세요.</p></div>
+    <button type="button" class="go" id="todoGoBtn">하러 가기</button>
+  </div>
+  <div class="card todo" id="nextClass">
+    <span class="dot">📅</span>
+    <div class="tx"><b id="nextTitle">다음 수업</b><p id="nextMsg"></p><p id="nextVote" style="font-weight:700"></p></div>
+    <button type="button" class="go" id="nextGoBtn">참석 투표</button>
+  </div>
+  <h2 class="sec">7주 커리큘럼</h2>
+  <p class="qhelp" style="margin:4px 0 0">주차를 누르면 수업 내용·참석 투표·자료·댓글을 볼 수 있어요.</p>
+  <div class="card" id="weekList"></div>
+</section>
+
+<!-- ============ 주차 상세 ============ -->
+<section id="view-week" class="view">
+  <button type="button" class="btn sub" id="weekBackBtn" style="margin-top:16px">← 커리큘럼으로</button>
+  <div class="card">
+    <span class="qnum" id="wkNum">1주차</span>
+    <p class="qtitle" id="wkTitle"></p>
+    <p class="qhelp" id="wkMeta" style="margin:0"></p>
+  </div>
+  <div class="card">
+    <p class="qtitle sm">🙋 참석 투표</p>
+    <p class="lbl" id="vtMainLbl" style="margin-top:0">본강의</p>
+    <div class="chips-row" id="vtMain"></div>
+    <p class="qhelp" id="vtMainCnt" style="margin:6px 0 0"></p>
+    <div id="vtMkBox">
+      <p class="lbl" id="vtMkLbl">보강수업</p>
+      <div class="chips-row" id="vtMk"></div>
+      <p class="qhelp" id="vtMkCnt" style="margin:6px 0 0"></p>
+    </div>
+    <p class="err" id="vtErr"></p>
+  </div>
+  <div class="card">
+    <p class="qtitle sm">수업 내용</p>
+    <div id="wkTable"></div>
+    <div id="wkExtra"></div>
+  </div>
+  <div class="card">
+    <p class="qtitle sm">📚 자료 · 링크</p>
+    <div id="wkFiles"></div>
+  </div>
+  <div class="card">
+    <p class="qtitle sm">💬 댓글</p>
+    <div id="cmList"></div>
+    <textarea id="cmText" maxlength="500" placeholder="질문이나 후기를 남겨 주세요" style="margin-top:10px;min-height:72px"></textarea>
+    <button type="button" class="btn sub" id="cmBtn">댓글 남기기</button>
+    <p class="err" id="cmErr"></p>
+  </div>
+</section>
+
+<!-- ============ 사전 설문 ============ -->
+<section id="view-survey" class="view">
+<form id="form" novalidate>
+  <div class="card">
+    <span class="qnum">1</span>
+    <p class="qtitle">성함</p>
+    <p class="qhelp" style="margin:0">로그인한 이름으로 제출돼요: <b id="q1Name"></b></p>
+  </div>
+  <div class="card">
+    <span class="qnum">2</span>
+    <p class="qtitle">나이</p>
+    <p class="qhelp">숫자로 적어 주세요.</p>
+    <input type="text" inputmode="numeric" id="ageNum" placeholder="예) 45" maxlength="3">
+    <p class="err" id="errAge">나이를 숫자로 적어 주세요.</p>
+  </div>
+  <div class="card">
+    <span class="qnum">3</span>
+    <p class="qtitle">성별</p>
+    <div class="chips" id="gender" data-single>
+      <button type="button" class="chip">남성</button>
+      <button type="button" class="chip">여성</button>
+    </div>
+    <p class="err" id="errGender">성별을 골라 주세요.</p>
+  </div>
+  <div class="card">
+    <span class="qnum">4</span>
+    <p class="qtitle">지금 하시는 일과 가장 가까운 것은?</p>
+    <div class="chips" id="job" data-single>
+      <button type="button" class="chip">보험 설계사</button>
+      <button type="button" class="chip">세무·회계 쪽 일</button>
+      <button type="button" class="chip">기업 컨설팅</button>
+      <button type="button" class="chip">영업·세일즈</button>
+      <button type="button" class="chip">사업 운영(대표)</button>
+      <button type="button" class="chip">기타</button>
+    </div>
+    <input type="text" id="jobEtc" placeholder="어떤 일인지 적어 주세요" style="margin-top:10px" hidden>
+    <p class="err" id="errJob">하시는 일을 골라 주세요.</p>
+  </div>
+  <div class="card">
+    <span class="qnum">5</span>
+    <p class="qtitle">기업 컨설팅 경험은 어느 정도인가요?</p>
+    <div class="chips" id="level" data-single>
+      <button type="button" class="chip">처음이에요</button>
+      <button type="button" class="chip">조금 해 봤어요</button>
+      <button type="button" class="chip">실무 경험이 많아요</button>
+    </div>
+    <textarea id="levelNote" placeholder="어떤 컨설팅을 해 보셨는지 간단히 적어 주세요 (선택)&#10;예) 제조업 고객 정책자금 2건 도와드렸어요" style="margin-top:10px;min-height:72px"></textarea>
+    <p class="err" id="errLevel">하나를 골라 주세요.</p>
+  </div>
+  <div class="card">
+    <span class="qnum">6</span>
+    <p class="qtitle">집중적으로 배우고 싶은 분야는?</p>
+    <p class="qhelp">7주 커리큘럼 중에서 골라 주세요. <b>최대 3개</b>까지 고를 수 있어요.</p>
+    <div class="chips" id="topics" data-max="3">
+      <button type="button" class="chip">창업·법인 설립 <span class="badge-ex">(1주차)</span></button>
+      <button type="button" class="chip">세무·노무 환급 <span class="badge-ex">(2주차)</span></button>
+      <button type="button" class="chip">정책자금 <span class="badge-ex">(3주차)</span></button>
+      <button type="button" class="chip">보험·클로징 화법 <span class="badge-ex">(4주차)</span></button>
+      <button type="button" class="chip">벤처인증·연구소 <span class="badge-ex">(5주차)</span></button>
+      <button type="button" class="chip">정부지원사업 <span class="badge-ex">(6주차)</span></button>
+      <button type="button" class="chip">IR·AI 활용 <span class="badge-ex">(7주차)</span></button>
+      <button type="button" class="chip">AX·클로드 사용 <span class="badge-ex">(6~7주차)</span></button>
+      <button type="button" class="chip">기타</button>
+    </div>
+    <input type="text" id="topicsEtc" placeholder="배우고 싶은 분야를 적어 주세요" style="margin-top:10px" hidden>
+    <p class="err" id="errTopics">1개 이상 골라 주세요.</p>
+  </div>
+  <div class="card">
+    <span class="qnum">7</span>
+    <p class="qtitle">이 강의를 통해 얻고 싶은 것은?</p>
+    <p class="qhelp">모두 골라 주세요.</p>
+    <div class="chips" id="goals">
+      <button type="button" class="chip">새 고객을 만나는 방법</button>
+      <button type="button" class="chip">상담·클로징 화법</button>
+      <button type="button" class="chip">정책자금 실무 능력</button>
+      <button type="button" class="chip">환급 실무 능력</button>
+      <button type="button" class="chip">AI 활용 능력</button>
+      <button type="button" class="chip">함께할 동료·네트워크</button>
+      <button type="button" class="chip">수입을 늘리는 것</button>
+      <button type="button" class="chip">기타</button>
+    </div>
+    <input type="text" id="goalsEtc" placeholder="얻고 싶은 것을 적어 주세요" style="margin-top:10px" hidden>
+    <p class="err" id="errGoals">1개 이상 골라 주세요.</p>
+  </div>
+  <div class="card">
+    <span class="qnum">8</span>
+    <p class="qtitle">지금 가장 큰 고민이나 궁금한 점</p>
+    <p class="qhelp">자유롭게 적어 주세요. (선택)</p>
+    <textarea id="worry" placeholder="예) 고객에게 정책자금 이야기를 어떻게 꺼내야 할지 모르겠어요"></textarea>
+  </div>
+  <div class="card">
+    <span class="qnum">9</span>
+    <p class="qtitle">1주차 10분 개인 상담에서 다루고 싶은 주제</p>
+    <p class="qhelp">1주차에 1:1 상담 시간이 있어요. 미리 적어 주시면 맞춰서 준비할게요. (선택)</p>
+    <textarea id="counsel" placeholder="예) 제 고객 중 제조업 대표님 사례를 상담받고 싶어요"></textarea>
+  </div>
+  <button type="submit" class="btn" id="submitBtn">제출하기</button>
+  <p class="err" id="errTop" style="text-align:center">아직 답하지 않은 질문이 있어요. 위로 올려서 확인해 주세요.</p>
+</form>
+<div id="doneView" class="card done" hidden>
+  <div class="big">🙌</div>
+  <h2 id="doneTitle">제출됐어요. 고맙습니다!</h2>
+  <p id="doneMsg">답해 주신 내용은 운영진만 보고, 강의 준비에 소중히 쓸게요.</p>
+  <div id="copyWrap" hidden>
+    <p style="color:var(--fg);font-weight:700;margin-top:18px">아래 내용을 복사해서 담당자에게 카카오톡으로 보내 주세요.</p>
+    <div class="copybox" id="copyBox"></div>
+    <button type="button" class="btn sub" id="copyBtn">내용 복사하기</button>
+  </div>
+  <button type="button" class="btn sub" id="editBtn">답을 고치고 싶어요</button>
+</div>
+</section>
+
+<!-- ============ 강의 자료 ============ -->
+<section id="view-materials" class="view">
+  <h2 class="sec">📚 강의 자료</h2>
+  <div class="card">
+    <p class="qhelp" style="margin-bottom:10px">파일은 누르면 내려받아져요. 링크는 새 창에서 열려요.</p>
+    <div id="matList"></div>
+  </div>
+</section>
+
+<!-- ============ 공지 ============ -->
+<section id="view-notice" class="view">
+  <h2 class="sec">📢 공지</h2>
+  <div class="card"><div id="ntList"></div></div>
+</section>
+
+<!-- ============ 내 정보 ============ -->
+<section id="view-account" class="view">
+  <h2 class="sec">내 정보</h2>
+  <div class="card">
+    <p class="qtitle" id="acName"></p>
+    <p class="qhelp" id="acRole" style="margin:0"></p>
+  </div>
+  <div class="card">
+    <p class="qtitle sm">🔑 비밀번호 바꾸기</p>
+    <form id="pwForm" novalidate>
+      <label class="lbl" for="pwOld">지금 비밀번호</label>
+      <input type="password" id="pwOld" autocomplete="current-password">
+      <label class="lbl" for="pwNew">새 비밀번호 (6자 이상)</label>
+      <input type="password" id="pwNew" autocomplete="new-password">
+      <label class="lbl" for="pwNew2">새 비밀번호 한 번 더</label>
+      <input type="password" id="pwNew2" autocomplete="new-password">
+      <p class="err" id="pwErr"></p>
+      <p class="okmsg" id="pwOk">비밀번호를 바꿨어요. 다음부터 새 비밀번호로 로그인해 주세요.</p>
+      <button type="submit" class="btn" id="pwBtn">비밀번호 바꾸기</button>
+    </form>
+  </div>
+  <button type="button" class="btn sub" id="logoutBtn">로그아웃</button>
+</section>
+
+<!-- ============ 관리자: 대시보드 ============ -->
+<section id="view-a-dash" class="view">
+  <h2 class="pg">대시보드</h2>
+  <div class="kpis" id="kpis"></div>
+  <div class="grid2">
+    <div class="card"><p class="qtitle sm">지금 챙길 일</p><div id="dashTodo"></div></div>
+    <div class="card"><p class="qtitle sm">교육생이 배우고 싶은 분야</p><div id="dashBars"></div></div>
+  </div>
+</section>
+
+<!-- ============ 관리자: 교육생 관리 ============ -->
+<section id="view-a-members" class="view">
+  <div class="pg-head"><h2 class="pg">교육생 관리</h2><span class="count-pill" id="memCount"></span></div>
+  <p class="qhelp" style="margin:6px 0 0">이름을 누르면 한 사람씩 관리할 수 있어요. (비밀번호·출석·메모·설문 응답)</p>
+  <p class="warn" id="pwReveal" hidden></p>
+  <div class="card tblwrap">
+    <table class="tbl">
+      <thead><tr><th>이름</th><th>구분</th><th>설문</th><th>비밀번호</th><th>출석</th><th>마지막 로그인</th><th></th></tr></thead>
+      <tbody id="memBody"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <p class="qtitle sm">회원 추가</p>
+    <p class="qhelp">이름이 아이디가 돼요. 추가하면 처음 비밀번호가 자동으로 만들어져 화면에 한 번 보여요.</p>
+    <input type="text" id="acNewName" placeholder="이름">
+    <div class="chips-row" style="margin-top:8px">
+      <button type="button" class="chip" id="acRoleT" aria-pressed="true">교육생</button>
+      <button type="button" class="chip" id="acRoleA" aria-pressed="false">운영진</button>
+    </div>
+    <button type="button" class="btn sub" id="acAddBtn">회원 추가</button>
+    <p class="err" id="acErr"></p>
+  </div>
+</section>
+
+<!-- ============ 관리자: 교육생 한 명 ============ -->
+<section id="view-a-member" class="view">
+  <button type="button" class="btn sub inline" id="memBackBtn" style="margin-top:16px">← 교육생 목록</button>
+  <div class="card">
+    <p class="qtitle" id="mName" style="font-size:21px"></p>
+    <div class="tags" id="mBadges" style="margin-top:6px"></div>
+    <p class="qhelp" id="mMeta" style="margin:10px 0 0"></p>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <p class="qtitle sm">🔑 비밀번호</p>
+      <p class="qhelp" id="mPwStatus"></p>
+      <p class="qhelp">저장된 비밀번호는 암호화돼 있어 볼 수 없어요. 대신 새로 정해 줄 수 있어요. 정해 주면 본인이 처음 로그인할 때 다시 자기 것으로 바꾸게 돼요.</p>
+      <label class="lbl" for="mPw">직접 정하기 (6자 이상)</label>
+      <input type="text" id="mPw" autocomplete="off" placeholder="새 비밀번호">
+      <button type="button" class="btn sub" id="mPwSetBtn">이 비밀번호로 정하기</button>
+      <button type="button" class="btn sub" id="mPwGenBtn">자동으로 만들기 (숫자 6자리)</button>
+      <button type="button" class="btn sub" id="mUnlockBtn" hidden>잠금 풀기</button>
+      <p class="warn" id="mPwReveal" hidden></p>
+      <p class="err" id="mPwErr"></p>
+    </div>
+    <div class="card">
+      <p class="qtitle sm">📋 출석 · 연락처 · 메모</p>
+      <p class="lbl" style="margin-top:0">출석한 주차 (누르면 표시)</p>
+      <div class="chips-row" id="mAttend"></div>
+      <label class="lbl" for="mPhone">연락처</label>
+      <input type="tel" id="mPhone" placeholder="010-0000-0000">
+      <label class="lbl" for="mMemo">메모 (운영진만 봐요)</label>
+      <textarea id="mMemo" placeholder="예) 결제 완료 · 정책자금에 관심 많음 · 1주차 상담 내용"></textarea>
+      <button type="button" class="btn sub" id="mSaveBtn">저장</button>
+      <p class="okmsg" id="mSaveOk">저장했어요.</p>
+      <p class="err" id="mSaveErr"></p>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card"><p class="qtitle sm">🙋 참석 투표</p><div id="mVotes"></div></div>
+    <div class="card"><p class="qtitle sm">📝 사전 설문 응답</p><div id="mResp"></div></div>
+  </div>
+  <div class="card">
+    <p class="qtitle sm">회원 삭제</p>
+    <p class="qhelp">삭제하면 이 사람은 로그인할 수 없고, 낸 설문 응답과 참석 투표도 함께 지워져요. 댓글은 남아요.</p>
+    <div id="mDelBox"></div>
+    <p class="err" id="mDelErr"></p>
+  </div>
+</section>
+
+<!-- ============ 관리자: 강의 관리 ============ -->
+<section id="view-a-weeks" class="view">
+  <h2 class="pg">강의 관리</h2>
+  <div class="card"><div class="chips-row" id="awChips"></div></div>
+  <div class="grid2">
+    <div class="card" id="awFormBox">
+      <p class="qtitle sm">수업 내용</p>
+      <label class="lbl" for="awTitle" style="margin-top:0">강의명</label>
+      <input type="text" id="awTitle">
+      <label class="lbl" for="awDate">본강의 날짜</label>
+      <input type="date" id="awDate">
+      <label class="lbl" for="awTeacher">강사</label>
+      <input type="text" id="awTeacher">
+      <label class="lbl" for="awPlace">본강의 장소</label>
+      <input type="text" id="awPlace">
+      <label class="lbl" for="awItem0">1교시 (1시~2시)</label>
+      <input type="text" id="awItem0">
+      <label class="lbl" for="awItem1">2교시 (2시~3시)</label>
+      <input type="text" id="awItem1">
+      <label class="lbl" for="awItem2">티타임 (3시~3시 30분)</label>
+      <input type="text" id="awItem2">
+      <label class="lbl" for="awItem3">4교시 (3시 30분~5시)</label>
+      <input type="text" id="awItem3">
+      <label class="lbl" for="awItem4">마무리 (5시~6시)</label>
+      <input type="text" id="awItem4">
+      <label class="lbl" for="awMk1">보강 날짜 1</label>
+      <input type="date" id="awMk1">
+      <label class="lbl" for="awMk2">보강 날짜 2</label>
+      <input type="date" id="awMk2">
+      <label class="lbl" for="awMakeup">보강 시간·장소</label>
+      <input type="text" id="awMakeup">
+      <label class="lbl" for="awEtc">기타</label>
+      <input type="text" id="awEtc">
+      <button type="button" class="btn sub" id="awSaveBtn">이 주차 내용 저장</button>
+      <p class="okmsg" id="awOk">저장했어요.</p>
+      <p class="err" id="awErr"></p>
+    </div>
+    <div>
+      <div class="card" id="awVoteBox">
+        <p class="qtitle sm">🙋 참석 투표 현황</p>
+        <div id="awVotes"></div>
+      </div>
+      <div class="card">
+        <p class="qtitle sm" id="awListHead">자료 · 링크</p>
+        <div id="awList"></div>
+        <p class="grp" style="margin-top:20px">🔗 링크 추가</p>
+        <input type="text" id="awLinkName" placeholder="링크 이름 (예: 정책자금 공고 모음)">
+        <input type="text" id="awLinkUrl" placeholder="주소 (https://...)" style="margin-top:8px" inputmode="url">
+        <button type="button" class="btn sub" id="awLinkBtn">링크 올리기</button>
+        <p class="err" id="awLinkErr"></p>
+        <p class="grp" style="margin-top:20px">📄 파일 올리기</p>
+        <p class="qhelp">PPT·한글·PDF 등 어떤 파일이든 20MB 이하면 돼요. 로그인한 교육생만 내려받을 수 있어요.</p>
+        <input type="text" id="matName" placeholder="자료 이름 (예: 1주차 교안)">
+        <input type="file" id="matFile" style="margin-top:8px">
+        <button type="button" class="btn sub" id="matUpBtn">파일 올리기</button>
+        <p class="err" id="matErr"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 관리자: 공지 ============ -->
+<section id="view-a-notice" class="view">
+  <h2 class="pg">공지</h2>
+  <div class="grid2">
+    <div class="card">
+      <p class="qtitle sm">공지 쓰기</p>
+      <input type="text" id="ntTitle" placeholder="공지 제목">
+      <textarea id="ntBody" placeholder="내용" style="margin-top:8px"></textarea>
+      <button type="button" class="btn sub" id="ntBtn">공지 올리기</button>
+      <p class="err" id="ntErr"></p>
+    </div>
+    <div class="card"><p class="qtitle sm">올라가 있는 공지</p><div id="ntAdminList"></div></div>
+  </div>
+</section>
+
+<!-- ============ 관리자: 설문 응답 ============ -->
+<section id="view-a-survey" class="view">
+  <div class="pg-head"><h2 class="pg">설문 응답</h2><span class="count-pill" id="respCount"></span></div>
+  <div class="card"><p class="qtitle sm">집중적으로 배우고 싶은 분야</p><div id="topicBars"></div></div>
+  <div class="card" id="respList"></div>
+</section>
+
+<p class="note" id="footNote">플레이업파트너스 · 팀100컨설팅 1기 (2026.11.28 ~ 2027.01.09)</p>
+</div>
+
+<div class="nav" id="nav" hidden><div class="nav-in">
+  <button type="button" data-v="home" aria-current="true"><span class="ic">🏠</span>홈</button>
+  <button type="button" data-v="survey"><span class="ic">📝</span>사전 설문</button>
+  <button type="button" data-v="materials"><span class="ic">📚</span>강의 자료</button>
+  <button type="button" data-v="notice"><span class="ic">📢</span>공지</button>
+</div></div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  function el(tag,cls,text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+  function showMsg(id,msg){ var e=$(id); if(msg!=null) e.textContent=msg; e.style.display='block'; }
+  function hideMsg(id){ $(id).style.display='none'; }
+  function mmdd(iso){ return (iso||'').slice(5,10).replace('-','/'); }
+  function fmtDT(iso){
+    if(!iso) return '';
+    var d=new Date(iso); if(isNaN(d.getTime())) return '';
+    return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+('0'+d.getMinutes()).slice(-2);
+  }
+  var toastT=null;
+  function toast(msg){ var t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(function(){ t.hidden=true; },3500); }
+
+  var COHORT='1기';
+  var API=String(window.TEAM100_API||'').trim(), MOCK=window.TEAM100_MOCK||null;
+  var token=null, S=null, me=null, saved=null;
+  var booting=false, surveyDone=false, loginHash=null, shell='user';
+  var loginMode='t', newRole='t', adminWeek=1, adminMember=null, busyN=0;
+
+  // ---- 서버와 이야기하기 ----
+  function setBusy(d){ busyN+=d; $('busy').hidden=busyN<=0; }
+  function setToken(t){ token=t; try{ if(t) localStorage.setItem('team100_token',t); else localStorage.removeItem('team100_token'); }catch(e){} }
+  function clearSession(){ setToken(null); S=null; me=null; saved=null; loginHash=null; surveyDone=false; try{ localStorage.removeItem('team100_snap'); }catch(e){} }
+  async function api(req){
+    if(token && req.action!=='login') req.token=token;
+    setBusy(1);
+    try{
+      var res;
+      if(MOCK) res=await MOCK(req);
+      else{
+        if(!API) return {ok:false,error:'nosetup'};
+        var r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(req),redirect:'follow'});
+        res=await r.json();
+      }
+      if(!res || typeof res!=='object') return {ok:false,error:'server'};
+      if(res.ok===false && res.error==='auth' && me){ clearSession(); route(); toast('다시 로그인해 주세요.'); }
+      return res;
+    }catch(e){ return {ok:false,error:'network'}; }
+    finally{ setBusy(-1); }
+  }
+  function errText(res){
+    var c=res && res.error;
+    return c==='network'? '인터넷 연결을 확인하고 다시 해 주세요.' :
+      c==='nosetup'? '아직 서버가 연결되지 않았어요. 운영진에게 알려 주세요.' :
+      c==='locked'? ('비밀번호를 여러 번 틀려서 잠겼어요. '+(res.mins||10)+'분 뒤에 다시 하거나 운영진에게 알려 주세요.') :
+      c==='login'? '아이디 또는 비밀번호가 맞지 않아요.' :
+      c==='auth'? '다시 로그인해 주세요.' :
+      c==='forbidden'? '이 계정으로는 할 수 없는 일이에요.' :
+      c==='toolarge'? '파일이 20MB보다 커요.' :
+      c==='exists'? '이미 있는 이름이에요.' :
+      c==='invalid'? '입력한 내용을 다시 확인해 주세요.' : '잠시 문제가 생겼어요. 다시 해 주세요.';
+  }
+  async function act(req,opt){
+    opt=opt||{};
+    if(opt.btn) opt.btn.disabled=true;
+    if(opt.err) hideMsg(opt.err);
+    var res=await api(req);
+    if(opt.btn) opt.btn.disabled=false;
+    if(res.ok){ if(res.token) setToken(res.token); if(res.data) applyData(res.data,false); return res; }
+    if(opt.err) showMsg(opt.err,errText(res)); else toast(errText(res));
+    return null;
+  }
+  async function hashPw(name,pw){
+    var enc=new TextEncoder();
+    var key=await crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveBits']);
+    var bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode('team100v2|'+name),iterations:150000,hash:'SHA-256'},key,256);
+    return Array.prototype.map.call(new Uint8Array(bits),function(b){return ('0'+b.toString(16)).slice(-2)}).join('');
+  }
+  function normId(v){ return String(v||'').normalize('NFC').replace(/\s+/g,'').slice(0,30); }
+  function genPw(){ var a=new Uint32Array(1); crypto.getRandomValues(a); return ('000000'+(a[0]%1000000)).slice(-6); }
+
+  // ---- 7주 기본 커리큘럼 (원본 한글 파일 그대로. 관리자가 고치면 고친 내용이 우선) ----
+  var TIMES=['1교시 · 1시~2시','2교시 · 2시~3시','티타임 · 3시~3시 30분','4교시 · 3시 30분~5시','마무리 · 5시~6시'];
+  var TEA='신입을 위한 반복 학습 편성(커피챗)';
+  var MK='오후 6~9시 · 플레이업파트너스';
+  var WEEK_DEF=[
+    {d:'2026-11-28',s:'변해영',t:'창업 컨설팅',place:'중기이코노미',
+     items:['창업기업의 이해와 설립 (개인·법인, 창업 인정)','기업 기본 인프라 구축 (업종코드·연구소·고용)',TEA,'자금·인증 확보 / 고용증대 세액공제','성장·사옥 마련 전략 + Q&A'],
+     mk:['2026-12-03','2026-12-04'],makeup:MK,etc:'10분 개인 상담 면담'},
+    {d:'2026-12-05',s:'권영휘',t:'세무·노무 / PR 컨설팅',place:'중기이코노미',
+     items:['기업환급컨설팅의 종류와 개념','노무환급 / 세무환급',TEA,'실전 RP','정책자금 영업과 실무 / Q&A'],
+     mk:['2026-12-10','2026-12-11'],makeup:MK,etc:'5명 선택하여 광고 소재 제작'},
+    {d:'2026-12-12',s:'변해영',t:'정책자금 컨설팅',place:'중기이코노미',
+     items:['정책자금 기관별 특징 (중진공·소진공·기보·신보)','정책자금 심화 — 심사·한도·부결 대응',TEA,'세금 컨설팅 — 급여대장 비과세·법인전환·벤처투자 절세','재무제표 진단 · 자금 사례 실습'],
+     mk:['2026-12-17','2026-12-18'],makeup:MK,etc:''},
+    {d:'2026-12-19',s:'변해영',t:'보험 컨설팅',place:'중기이코노미',
+     items:['법인 설립 실무 / 클로징·화법','창업의 조건 – 3주차 연속 비과세 컨설팅',TEA,'보험 클로징 — 리스크 진단·임원 퇴직금','상담 화법 · 롤플레이 실습'],
+     mk:['2026-12-22','2026-12-23'],makeup:MK,etc:'6명 선택하여 광고 소재 제작'},
+    {d:'2026-12-26',s:'류귀렬',t:'벤처인증 강의 기본 (연구소관리)',place:'중기이코노미',
+     items:['벤처인증 기본교육','연구소 설립 / MOU / 출원',TEA,'사례 교육 : 더창 컴퍼니 AX 활용','사례 교육 : 기타 등'],
+     mk:['2026-12-30','2026-12-31'],makeup:MK,etc:''},
+    {d:'2027-01-02',s:'류귀렬',t:'정부지원 강의 기본 (클로드·AX)',place:'중기이코노미',
+     items:['정부지원사업 카테고리','PSST사업 사례',TEA,'아이템 선정부터 결과물까지 현장지도 (그 자리에서 작성하는 것 보여주기 + 질의 응답)',''],
+     mk:['2027-01-07','2027-01-08'],makeup:MK,etc:''},
+    {d:'2027-01-09',s:'류귀렬',t:'IR 기본 · AX 기본',place:'중기이코노미',
+     items:['IR이란 기본교육','워크북 타임 / AI 활용 제작 시범',TEA,'AX 목업 제작법 기본 IT강의','실제 실무'],
+     mk:['2027-01-14','2027-01-15'],makeup:MK,etc:'저녁식사 · 2기 재수강 모집'}
+  ];
+  function wk(n){
+    var def=WEEK_DEF[n-1], ov=(S && S.weeks && S.weeks['w'+n]) || {}, o={w:n};
+    ['d','s','t','place','makeup','etc'].forEach(function(k){ o[k]=(typeof ov[k]==='string')? ov[k] : def[k]; });
+    o.items=(Array.isArray(ov.items)&&ov.items.length===5)? ov.items : def.items;
+    o.mk=Array.isArray(ov.mk)? ov.mk : def.mk;
+    return o;
+  }
+  function matsOf(n){ return (S? S.materials : []).filter(function(d){ return d.week===n; }); }
+  function fmtD(iso){
+    var dt=new Date(iso+'T00:00:00');
+    if(isNaN(dt.getTime())) return iso||'';
+    return (dt.getMonth()+1)+'월 '+dt.getDate()+'일 ('+'일월화수목금토'.charAt(dt.getDay())+')';
+  }
+  function nextWeek(){
+    var today=new Date(); today.setHours(0,0,0,0);
+    for(var n=1;n<=7;n++){ var k=wk(n); if(new Date(k.d+'T00:00:00')>=today) return k; }
+    return null;
+  }
+  function dday(iso){
+    var today=new Date(); today.setHours(0,0,0,0);
+    var diff=Math.round((new Date(iso+'T00:00:00')-today)/86400000);
+    return diff<0? '끝' : (diff===0? '오늘!' : 'D-'+diff);
+  }
+
+  // ---- 화면 전환 ----
+  var ADMIN_VIEWS=['a-dash','a-members','a-member','a-weeks','a-notice','a-survey'];
+  var USER_VIEWS=['home','survey','materials','notice','account'];
+  var ALL_VIEWS=['boot','login','setpw','week'].concat(USER_VIEWS,ADMIN_VIEWS);
+  function hashName(){ return (location.hash||'').replace('#',''); }
+  function curWeek(){ var m=/^w([1-7])$/.exec(hashName()); return m? parseInt(m[1],10) : 0; }
+  function mustSetPw(){ return !!(S && me && me.role==='t' && !S.me.changed); }
+  function curView(){
+    if(booting) return 'boot';
+    if(!me) return 'login';
+    if(mustSetPw()) return 'setpw';
+    if(curWeek()) return 'week';
+    var h=hashName();
+    if(ADMIN_VIEWS.indexOf(h)>=0){
+      if(me.role!=='a') return 'home';
+      if(h==='a-member' && !memberAcc()) return 'a-members';
+      return h;
+    }
+    if(USER_VIEWS.indexOf(h)>=0) return h;
+    return me.role==='a'? 'a-dash' : 'home';
+  }
+  var lastKey='';
+  function route(){
+    var v=curView();
+    if(ADMIN_VIEWS.indexOf(v)>=0) shell='adm'; else if(v!=='account') shell='user';
+    var adm=!!(me && me.role==='a' && (ADMIN_VIEWS.indexOf(v)>=0 || (v==='account' && shell==='adm')));
+    document.body.classList.toggle('adm',adm);
+    $('admSide').hidden=!adm;
+    $('topbar').hidden=adm;
+    var inApp=!!me && v!=='setpw' && v!=='boot' && !adm;
+    $('nav').hidden=!inApp;
+    $('accountBtn').hidden=!inApp;
+    $('adminOpenBtn').hidden=!(inApp && me.role==='a');
+    $('footNote').hidden=adm;
+    ALL_VIEWS.forEach(function(n){ $('view-'+n).classList.toggle('on', n===v); });
+    var navV=(v==='week')? 'home' : v;
+    document.querySelectorAll('.nav button').forEach(function(b){ b.setAttribute('aria-current', b.getAttribute('data-v')===navV ? 'true':'false'); });
+    var sideV=(v==='a-member')? 'a-members' : v;
+    document.querySelectorAll('.adm-side button[data-v]').forEach(function(b){ b.setAttribute('aria-current', b.getAttribute('data-v')===sideV ? 'true':'false'); });
+    $('form').hidden=surveyDone;
+    $('doneView').hidden=!surveyDone;
+    if(v==='week') renderWeek(curWeek());
+    if(v==='account') renderAccount();
+    if(v==='setpw') $('spOldBox').hidden=!!loginHash;
+    if(v==='a-member') renderMemberStatus();
+    var key=v+(v==='week'? curWeek():'')+(v==='a-member'? adminMember:'');
+    if(key!==lastKey){ lastKey=key; window.scrollTo(0,0); }
+  }
+  function go(h){ if(hashName()!==h) location.hash=h; route(); }
+  window.addEventListener('hashchange',route);
+  document.querySelectorAll('.nav button, .adm-side button[data-v]').forEach(function(b){
+    b.addEventListener('click',function(){ go(b.getAttribute('data-v')); });
+  });
+  $('adminOpenBtn').addEventListener('click',function(){ go('a-dash'); });
+  $('accountBtn').addEventListener('click',function(){ go('account'); });
+  $('todoGoBtn').addEventListener('click',function(){ go('survey'); });
+  $('weekBackBtn').addEventListener('click',function(){ go('home'); });
+  $('memBackBtn').addEventListener('click',function(){ go('a-members'); });
+  function doLogout(){ clearSession(); if(hashName()) location.hash=''; route(); }
+  $('logoutBtn').addEventListener('click',doLogout);
+  $('admLogout').addEventListener('click',doLogout);
+  $('spLogout').addEventListener('click',doLogout);
+
+  // ---- 서버에서 받은 내용 반영 ----
+  function applyData(d,first){
+    S=d; me={name:d.me.id, role:d.me.role}; saved=d.response;
+    // 교육생은 마지막 화면 내용을 이 기기에 기억해 두었다가, 다음에 열 때 바로 보여 준다. (관리자 자료는 기억하지 않는다)
+    if(me.role==='t'){ try{ localStorage.setItem('team100_snap',JSON.stringify(d)); }catch(e){} }
+    $('helloName').textContent=me.name+' 님, 반갑습니다';
+    $('q1Name').textContent=me.name;
+    if(first && saved) fill(saved);
+    refreshTodo();
+    renderHome(); renderMats(); renderNotices(); renderAwSide();
+    if(me.role==='a'){ renderDash(); renderMembers(); renderSurveyAdmin(); }
+    route();
+  }
+
+  // ---- 로그인 ----
+  function setLoginMode(m){
+    loginMode=m;
+    $('tabUser').setAttribute('aria-pressed', m==='t'? 'true':'false');
+    $('tabAdmin').setAttribute('aria-pressed', m==='a'? 'true':'false');
+    $('loginHelp').textContent = m==='t'? '아이디는 본인 이름이에요. 처음이면 운영진에게 받은 비밀번호를 적어 주세요.' : '운영진 전용이에요. 관리자 아이디와 비밀번호를 적어 주세요.';
+    $('loginIdLbl').textContent = m==='t'? '아이디 (이름)' : '관리자 아이디';
+    $('loginId').placeholder = m==='t'? '예) 홍길동' : '관리자 아이디';
+    hideMsg('loginErr');
+  }
+  $('tabUser').addEventListener('click',function(){ setLoginMode('t'); });
+  $('tabAdmin').addEventListener('click',function(){ setLoginMode('a'); });
+  if(hashName().indexOf('a-')===0 || hashName()==='admin') setLoginMode('a');
+
+  $('loginForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=normId($('loginId').value), pw=$('loginPw').value;
+    if(!name||!pw){ showMsg('loginErr','아이디와 비밀번호를 모두 적어 주세요.'); return; }
+    if(!(window.crypto && crypto.subtle)){ showMsg('loginErr','이 브라우저에서는 로그인할 수 없어요. 크롬이나 사파리로 열어 주세요.'); return; }
+    var btn=$('loginBtn'); btn.disabled=true; btn.textContent='확인 중...'; hideMsg('loginErr');
+    (async function(){
+      try{
+        var h=await hashPw(name,pw);
+        var res=await api({action:'login',id:name,hash:h});
+        if(!res.ok){ showMsg('loginErr',errText(res)); return; }
+        if(res.data.me.role!==loginMode){
+          showMsg('loginErr', res.data.me.role==='a'? '이 계정은 위의 "관리자 로그인"으로 들어가 주세요.' : '이 계정은 위의 "교육생 로그인"으로 들어가 주세요.');
+          return;
+        }
+        setToken(res.token); loginHash=h; $('loginPw').value='';
+        applyData(res.data,true);
+        go(me.role==='a'? 'a-dash':'home');
+      }catch(err){ showMsg('loginErr','로그인 확인에 실패했어요. 다시 해 주세요.'); }
+      finally{ btn.disabled=false; btn.textContent='로그인'; }
+    })();
+  });
+
+  // ---- 비밀번호 정하기 / 바꾸기 ----
+  async function changePw(oldHash,newPw,errId,btn){
+    var newHash=await hashPw(me.name,newPw);
+    if(btn) btn.disabled=true;
+    hideMsg(errId);
+    var res=await api({action:'changePw',oldHash:oldHash,newHash:newHash});
+    if(btn) btn.disabled=false;
+    if(!res.ok){ showMsg(errId, res.error==='login'? '지금 비밀번호(받은 비밀번호)가 맞지 않아요.' : errText(res)); return null; }
+    setToken(res.token); loginHash=newHash; applyData(res.data,false);
+    return res;
+  }
+  function checkNewPw(a,b,errId){
+    if(a.length<6){ showMsg(errId,'새 비밀번호는 6자 이상으로 정해 주세요.'); return false; }
+    if(a!==b){ showMsg(errId,'새 비밀번호 두 칸이 서로 달라요.'); return false; }
+    return true;
+  }
+  $('spForm').addEventListener('submit',function(e){
+    e.preventDefault(); hideMsg('spErr');
+    var a=$('spNew').value, b=$('spNew2').value;
+    if(!checkNewPw(a,b,'spErr')) return;
+    (async function(){
+      var oldHash=loginHash;
+      if(!oldHash){
+        if(!$('spOld').value){ showMsg('spErr','받은 비밀번호를 적어 주세요.'); return; }
+        oldHash=await hashPw(me.name,$('spOld').value);
+      }
+      var res=await changePw(oldHash,a,'spErr',$('spBtn'));
+      if(res){ $('spNew').value=''; $('spNew2').value=''; $('spOld').value=''; toast('비밀번호를 정했어요. 환영합니다!'); go('home'); }
+    })();
+  });
+  $('pwForm').addEventListener('submit',function(e){
+    e.preventDefault(); hideMsg('pwErr'); hideMsg('pwOk');
+    var o=$('pwOld').value, a=$('pwNew').value, b=$('pwNew2').value;
+    if(!o){ showMsg('pwErr','지금 비밀번호를 적어 주세요.'); return; }
+    if(!checkNewPw(a,b,'pwErr')) return;
+    (async function(){
+      var res=await changePw(await hashPw(me.name,o),a,'pwErr',$('pwBtn'));
+      if(res){ $('pwOld').value=''; $('pwNew').value=''; $('pwNew2').value=''; showMsg('pwOk'); }
+    })();
+  });
+  function renderAccount(){
+    if(!me) return;
+    $('acName').textContent=me.name;
+    $('acRole').textContent=(me.role==='a'? '운영진' : '교육생')+' · 팀100컨설팅 '+COHORT;
+  }
+
+  // ---- 홈 ----
+  function renderHome(){
+    var list=$('weekList'); list.textContent='';
+    for(var n=1;n<=7;n++){ (function(n){
+      var k=wk(n), dd=dday(k.d);
+      var row=el('button','week'+(dd==='끝'?' past':'')); row.type='button';
+      row.appendChild(el('span','wn',n+'주'));
+      var wt=el('span','wt'); wt.appendChild(el('b',null,k.t)); wt.appendChild(el('span',null,fmtD(k.d)+' · '+k.s)); row.appendChild(wt);
+      row.appendChild(el('span','dday',dd));
+      row.addEventListener('click',function(){ go('w'+n); });
+      list.appendChild(row);
+    })(n); }
+    var next=nextWeek();
+    if(next){
+      $('nextTitle').textContent='다음 수업: '+next.w+'주차 '+next.t+' ('+dday(next.d)+')';
+      $('nextMsg').textContent=fmtD(next.d)+' 오후 1시 · '+next.s+' 강사 · '+next.place;
+      var mv=(S && S.votes.mine[String(next.w)]) || {};
+      $('nextVote').textContent = mv.main==='y'? '✅ 참석으로 투표했어요' : (mv.main==='n'? '불참으로 투표했어요' : '아직 참석 투표를 안 했어요');
+      $('nextGoBtn').hidden=false;
+      $('nextGoBtn').textContent = mv.main? '투표 보기' : '참석 투표';
+      $('nextGoBtn').onclick=function(){ go('w'+next.w); };
+    }else{
+      $('nextTitle').textContent='7주 과정이 모두 끝났어요';
+      $('nextMsg').textContent='수고 많으셨습니다!';
+      $('nextVote').textContent='';
+      $('nextGoBtn').hidden=true;
+    }
+  }
+  function refreshTodo(){
+    var doneS=!!saved;
+    $('todoSurveyMsg').textContent = doneS? '제출 완료! 고치고 싶으면 다시 열 수 있어요.' : '시작 전에 2~3분만 내주세요.';
+    $('todoGoBtn').textContent = doneS? '다시 보기' : '하러 가기';
+    $('todoSurvey').querySelector('.dot').textContent = doneS? '✅' : '📝';
+  }
+
+  // ---- 자료·링크 ----
+  function sureBtn(label,fn){
+    var b=el('button','mat-del',label||'삭제'); b.type='button';
+    b.addEventListener('click',function(){
+      if(b.dataset.sure!=='1'){ b.dataset.sure='1'; b.textContent='한 번 더 누르면 '+(label||'삭제'); return; }
+      b.disabled=true; fn(b);
+    });
+    return b;
+  }
+  async function downloadFile(d,btn){
+    var old=btn.textContent; btn.disabled=true; btn.textContent='받는 중...';
+    var res=await api({action:'getFile',id:d.id});
+    btn.disabled=false; btn.textContent=old;
+    if(!res.ok){ toast(errText(res)); return; }
+    var blob;
+    try{ blob=await (await fetch('data:'+(res.mime||'application/octet-stream')+';base64,'+res.b64)).blob(); }
+    catch(e){
+      var bin=atob(res.b64), arr=new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+      blob=new Blob([arr],{type:res.mime||'application/octet-stream'});
+    }
+    var url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=res.fname||d.name||'file'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); },60000);
+  }
+  function matRow(d,withDel){
+    var r=el('div','mat-row');
+    if(d.kind==='link'){
+      if(/^https:\/\//.test(d.url||'')){ var a=el('a',null,'🔗 '+(d.name||d.url)); a.href=d.url; a.target='_blank'; a.rel='noopener'; r.appendChild(a); }
+      else r.appendChild(el('span',null,'🔗 '+(d.name||'링크')));
+    }else{
+      var b=el('button','mat-link','📄 '+(d.name||'자료')); b.type='button';
+      b.addEventListener('click',function(){ downloadFile(d,b); });
+      r.appendChild(b);
+      r.appendChild(el('span','mat-size', d.size? (d.size>1048576? (d.size/1048576).toFixed(1)+'MB' : Math.max(1,Math.round(d.size/1024))+'KB') : ''));
+    }
+    if(withDel) r.appendChild(sureBtn('삭제',function(){ act({action:'delMaterial',id:d.id}); }));
+    return r;
+  }
+  function fillMats(box,n,withDel,emptyText){
+    box.textContent='';
+    var ms=matsOf(n);
+    if(!ms.length){ if(emptyText) box.appendChild(el('p','empty',emptyText)); return; }
+    ms.forEach(function(d){ box.appendChild(matRow(d,withDel)); });
+  }
+  function renderMats(){
+    var list=$('matList'); list.textContent='';
+    var any=false;
+    for(var n=0;n<=7;n++){
+      if(!matsOf(n).length) continue;
+      any=true;
+      list.appendChild(el('p','grp', n===0? '공통 자료' : n+'주차 · '+wk(n).t));
+      var box=el('div'); fillMats(box,n,false,''); list.appendChild(box);
+    }
+    if(!any) list.appendChild(el('p','empty','아직 올라온 자료가 없어요. 수업이 진행되면 여기에 올라와요.'));
+  }
+
+  // ---- 주차 상세 + 참석 투표 + 댓글 ----
+  function renderWeek(n){
+    if(!n || !S) return;
+    var k=wk(n);
+    $('wkNum').textContent=COHORT+' · '+n+'주차';
+    $('wkTitle').textContent=k.t;
+    $('wkMeta').textContent=fmtD(k.d)+' 오후 1~6시 · '+k.s+' 강사 · '+k.place;
+    var tb=$('wkTable'); tb.textContent='';
+    TIMES.forEach(function(tm,i){
+      if(!k.items[i]) return;
+      var r=el('div','trow'); r.appendChild(el('span','ttime',tm)); r.appendChild(el('span','ttext',k.items[i])); tb.appendChild(r);
+    });
+    var ex=$('wkExtra'); ex.textContent='';
+    function extra(label,val){ var b=el('div','extra'); b.appendChild(el('b',null,label)); b.appendChild(document.createTextNode(val)); ex.appendChild(b); }
+    if(k.mk.length) extra('보강수업', k.mk.map(fmtD).join(' 또는 ')+(k.makeup? ' · '+k.makeup : ''));
+    if(k.etc) extra('기타',k.etc);
+    fillMats($('wkFiles'),n,false,'아직 올라온 자료가 없어요.');
+    renderVote(n);
+    renderComments(n);
+  }
+  function renderVote(n){
+    var k=wk(n), mine=S.votes.mine[String(n)]||{main:'',makeup:''}, c=S.votes.counts[String(n)]||{y:0,n:0,m1:0,m2:0,mn:0};
+    function chips(box,opts,cur,field){
+      box.textContent='';
+      opts.forEach(function(o){
+        var b=el('button','chip',o[1]); b.type='button';
+        b.setAttribute('aria-pressed', cur===o[0]? 'true':'false');
+        b.addEventListener('click',function(){
+          var v={main:mine.main||'', makeup:mine.makeup||''};
+          v[field]=(cur===o[0])? '' : o[0];
+          var key=String(n), prev=S.votes.mine[key];
+          S.votes.mine[key]=v;                      // 누르자마자 화면에 먼저 반영하고, 서버 저장은 뒤에서
+          hideMsg('vtErr'); renderVote(n); renderHome();
+          api({action:'vote',week:n,main:v.main,makeup:v.makeup}).then(function(res){
+            if(res.ok){ applyData(res.data,false); return; }
+            if(!S) return;
+            if(prev) S.votes.mine[key]=prev; else delete S.votes.mine[key];
+            renderVote(n); renderHome(); showMsg('vtErr','투표가 저장되지 않았어요. '+errText(res));
+          });
+        });
+        box.appendChild(b);
+      });
+    }
+    $('vtMainLbl').textContent='본강의 · '+fmtD(k.d)+' 오후 1~6시';
+    chips($('vtMain'),[['y','참석해요'],['n','못 가요']],mine.main,'main');
+    $('vtMainCnt').textContent='지금까지 참석 '+c.y+'명 · 불참 '+c.n+'명';
+    $('vtMkBox').hidden=!k.mk.length;
+    if(k.mk.length){
+      $('vtMkLbl').textContent='보강수업'+(k.makeup? ' · '+k.makeup : '')+' — 올 수 있는 날';
+      var opts=[['1',fmtD(k.mk[0])]];
+      if(k.mk[1]){ opts.push(['2',fmtD(k.mk[1])]); opts.push(['both','둘 다 가능']); }
+      opts.push(['n','보강은 안 가요']);
+      chips($('vtMk'),opts,mine.makeup,'makeup');
+      $('vtMkCnt').textContent=fmtD(k.mk[0])+' '+c.m1+'명'+(k.mk[1]? ' · '+fmtD(k.mk[1])+' '+c.m2+'명' : '')+' · 안 감 '+c.mn+'명';
+    }
+  }
+  function renderComments(n){
+    var list=$('cmList'); list.textContent='';
+    var rows=S.comments.filter(function(c){ return c.week===n; }).sort(function(a,b){ return (a.at||'').localeCompare(b.at||''); });
+    if(!rows.length) list.appendChild(el('p','empty','아직 댓글이 없어요. 첫 댓글을 남겨 보세요.'));
+    rows.forEach(function(c){
+      var box=el('div','cm');
+      box.appendChild(el('b',null,c.name||'이름 없음'));
+      box.appendChild(el('span','ntd',mmdd(c.at)));
+      box.appendChild(el('p',null,c.text||''));
+      if(c.mine || me.role==='a') box.appendChild(sureBtn('삭제',function(){ act({action:'delComment',id:c.id}); }));
+      list.appendChild(box);
+    });
+  }
+  $('cmBtn').addEventListener('click',function(){
+    var n=curWeek(), text=$('cmText').value.trim();
+    hideMsg('cmErr');
+    if(!n) return;
+    if(!text){ showMsg('cmErr','내용을 적어 주세요.'); return; }
+    act({action:'addComment',week:n,text:text},{err:'cmErr',btn:$('cmBtn')}).then(function(res){ if(res) $('cmText').value=''; });
+  });
+
+  // ---- 설문 ----
+  document.querySelectorAll('.chips').forEach(function(g){
+    g.addEventListener('click',function(e){
+      var b=e.target.closest('.chip'); if(!b) return;
+      var on=b.getAttribute('aria-pressed')==='true';
+      if(g.hasAttribute('data-single')){
+        g.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed','false')});
+        b.setAttribute('aria-pressed','true');
+      }else{
+        var max=parseInt(g.getAttribute('data-max')||'99',10);
+        var cnt=g.querySelectorAll('.chip[aria-pressed="true"]').length;
+        if(!on && cnt>=max) return;
+        b.setAttribute('aria-pressed',on?'false':'true');
+      }
+      if(g.id==='job'){ $('jobEtc').hidden = chipVal('job')!=='기타'; }
+      if(g.id==='topics'){ $('topicsEtc').hidden = chipVals('topics').indexOf('기타')<0; }
+      if(g.id==='goals'){ $('goalsEtc').hidden = chipVals('goals').indexOf('기타')<0; }
+    });
+  });
+  document.querySelectorAll('.chips .chip').forEach(function(c){c.setAttribute('aria-pressed','false')});
+  function chipText(b){ return b.textContent.replace(/\([\d~]+주차\)/,'').trim(); }
+  function chipVal(id){ var b=document.querySelector('#'+id+' .chip[aria-pressed="true"]'); return b? chipText(b) : ''; }
+  function chipVals(id){ return Array.prototype.map.call(document.querySelectorAll('#'+id+' .chip[aria-pressed="true"]'),chipText); }
+  function withEtc(arr,etc){ etc=(etc||'').trim(); return arr.map(function(t){return t==='기타'&&etc? '기타: '+etc : t}); }
+  function collect(){
+    return {
+      cohort:COHORT, name:me? me.name : '', age:$('ageNum').value.trim(), gender:chipVal('gender'),
+      job:chipVal('job')==='기타'? ('기타: '+$('jobEtc').value.trim()) : chipVal('job'),
+      level:chipVal('level'), levelNote:$('levelNote').value.trim(),
+      topics:withEtc(chipVals('topics'),$('topicsEtc').value),
+      goals:withEtc(chipVals('goals'),$('goalsEtc').value),
+      worry:$('worry').value.trim(), counsel:$('counsel').value.trim()
+    };
+  }
+  function validate(d){
+    var ok=true;
+    function flag(id,bad){ $(id).style.display = bad?'block':'none'; if(bad) ok=false; }
+    flag('errAge',!/^\d{1,3}$/.test(d.age)); flag('errGender',!d.gender);
+    flag('errJob',!chipVal('job')); flag('errLevel',!d.level);
+    flag('errTopics',d.topics.length===0); flag('errGoals',d.goals.length===0);
+    $('errTop').style.display = ok?'none':'block';
+    return ok;
+  }
+  function asText(d){
+    return '[팀100컨설팅 '+COHORT+' 사전 설문]\n성함: '+d.name+'\n나이: '+d.age+'세\n성별: '+d.gender
+      +'\n하는 일: '+d.job+'\n컨설팅 경험: '+d.level
+      +(d.levelNote? '\n경험 내용: '+d.levelNote : '')
+      +'\n배우고 싶은 분야: '+d.topics.join(', ')
+      +'\n얻고 싶은 것: '+d.goals.join(', ')
+      +(d.worry? '\n고민/궁금한 점: '+d.worry : '')
+      +(d.counsel? '\n개인 상담 주제: '+d.counsel : '');
+  }
+  $('form').addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!me) return;
+    var d=collect();
+    if(!validate(d)) return;
+    var btn=$('submitBtn'); btn.disabled=true; btn.textContent='보내는 중...';
+    (async function(){
+      var res=await api({action:'saveResponse',data:d});
+      btn.disabled=false; btn.textContent='제출하기';
+      surveyDone=true;
+      if(res.ok){
+        $('doneTitle').textContent='제출됐어요. 고맙습니다!';
+        $('doneMsg').textContent='답해 주신 내용은 운영진만 보고, 강의 준비에 소중히 쓸게요.';
+        $('copyWrap').hidden=true;
+        applyData(res.data,false);
+      }else{
+        $('doneTitle').textContent='저장이 안 됐어요';
+        $('doneMsg').textContent=errText(res);
+        $('copyBox').textContent=asText(d);
+        $('copyWrap').hidden=false;
+        route();
+      }
+      window.scrollTo(0,0);
+    })();
+  });
+  $('copyBtn').addEventListener('click',function(){
+    var t=$('copyBox').textContent;
+    function selectBox(){
+      var r=document.createRange(); r.selectNodeContents($('copyBox'));
+      var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      $('copyBtn').textContent='글자를 길게 눌러 복사해 주세요';
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){ $('copyBtn').textContent='복사됐어요! 카카오톡에 붙여넣어 주세요'; }).catch(selectBox);
+    }else selectBox();
+  });
+  $('editBtn').addEventListener('click',function(){ surveyDone=false; route(); window.scrollTo(0,0); });
+  function fill(d){
+    function setChip(id,vals){
+      document.querySelectorAll('#'+id+' .chip').forEach(function(b){ b.setAttribute('aria-pressed', vals.indexOf(chipText(b))>=0 ? 'true':'false'); });
+    }
+    $('ageNum').value=String(d.age||'').replace(/[^0-9]/g,'');
+    setChip('gender',[d.gender]); setChip('level',[d.level]);
+    if(d.job && d.job.indexOf('기타: ')===0){ setChip('job',['기타']); $('jobEtc').hidden=false; $('jobEtc').value=d.job.slice(4); }
+    else setChip('job',[d.job]);
+    function fillMulti(id,etcId,vals){
+      var etc='';
+      vals=vals.map(function(t){ if(typeof t==='string' && t.indexOf('기타')===0){ etc=t.replace(/^기타:?\s*/,''); return '기타'; } return t; });
+      setChip(id,vals); $(etcId).hidden = vals.indexOf('기타')<0; $(etcId).value=etc;
+    }
+    fillMulti('topics','topicsEtc',Array.isArray(d.topics)? d.topics : []);
+    fillMulti('goals','goalsEtc',Array.isArray(d.goals)? d.goals : []);
+    $('levelNote').value=d.levelNote||''; $('worry').value=d.worry||''; $('counsel').value=d.counsel||'';
+  }
+
+  // ---- 공지 ----
+  function noticeBox(d,withDel){
+    var box=el('div','nt');
+    box.appendChild(el('b',null,d.title||'(제목 없음)'));
+    box.appendChild(el('span','ntd',mmdd(d.at)));
+    if(d.body) box.appendChild(el('p',null,d.body));
+    if(withDel) box.appendChild(sureBtn('삭제',function(){ act({action:'delNotice',id:d.id}); }));
+    return box;
+  }
+  function renderNotices(){
+    var rows=(S? S.notices : []).slice().sort(function(a,b){ return (b.at||'').localeCompare(a.at||''); });
+    [['ntList',false],['ntAdminList',true]].forEach(function(p){
+      var list=$(p[0]); list.textContent='';
+      if(!rows.length){ list.appendChild(el('p','empty','아직 공지가 없어요.')); return; }
+      rows.forEach(function(d){ list.appendChild(noticeBox(d,p[1])); });
+    });
+  }
+  $('ntBtn').addEventListener('click',function(){
+    var title=$('ntTitle').value.trim(), body=$('ntBody').value.trim();
+    hideMsg('ntErr');
+    if(!title){ showMsg('ntErr','제목을 적어 주세요.'); return; }
+    act({action:'addNotice',title:title,body:body},{err:'ntErr',btn:$('ntBtn')}).then(function(res){ if(res){ $('ntTitle').value=''; $('ntBody').value=''; toast('공지를 올렸어요.'); } });
+  });
+
+  // ---- 관리자: 공통 ----
+  var TOPICS=['창업·법인 설립','세무·노무 환급','정책자금','보험·클로징 화법','벤처인증·연구소','정부지원사업','IR·AI 활용','AX·클로드 사용','기타'];
+  function trainees(){ return S.admin.accounts.filter(function(a){ return a.role==='t'; }); }
+  function respOf(id){ var r=null; S.admin.responses.forEach(function(x){ if(x.name===id) r=x; }); return r; }
+  function votesOf(id){ return S.admin.votes.filter(function(v){ return v.by===id; }); }
+  function renderBars(box,resp){
+    var counts={}; TOPICS.forEach(function(t){counts[t]=0});
+    resp.forEach(function(d){ (Array.isArray(d.topics)? d.topics : []).forEach(function(t){
+      if(typeof t!=='string') return;
+      if(t.indexOf('기타')===0) t='기타';
+      if(Object.prototype.hasOwnProperty.call(counts,t)) counts[t]++;
+    }); });
+    var maxN=Math.max.apply(null,[1].concat(TOPICS.map(function(t){return counts[t]})));
+    box.textContent='';
+    if(!resp.length){ box.appendChild(el('p','empty','아직 응답이 없어요.')); return; }
+    TOPICS.forEach(function(t){
+      var row=el('div','bar-row');
+      row.appendChild(el('div','bar-label',t));
+      var tr=el('div','bar-track'), f=el('div','bar-fill'); f.style.width=(counts[t]/maxN*100)+'%'; tr.appendChild(f); row.appendChild(tr);
+      row.appendChild(el('div','bar-n',String(counts[t])));
+      box.appendChild(row);
+    });
+  }
+  function respBox(d,withName){
+    var box=el('div','resp');
+    if(withName) box.appendChild(el('div','name',d.name||'(이름 없음)'));
+    box.appendChild(el('div','meta',[(d.age? d.age+'세':null),d.gender,d.job,('경험: '+(d.level||'-'))].filter(Boolean).join(' · ')));
+    var tags=el('div','tags');
+    (Array.isArray(d.topics)? d.topics : []).forEach(function(t){ tags.appendChild(el('span','tag',String(t))); });
+    (Array.isArray(d.goals)? d.goals : []).forEach(function(t){ var s=el('span','tag',String(t)); s.style.opacity='.65'; tags.appendChild(s); });
+    box.appendChild(tags);
+    function free(label,val){ if(!val) return; var w=el('div','free'); w.appendChild(el('b',null,label)); w.appendChild(document.createTextNode(String(val))); box.appendChild(w); }
+    free('컨설팅 경험 내용',d.levelNote); free('고민·궁금한 점',d.worry); free('개인 상담 주제',d.counsel);
+    return box;
+  }
+  function pill(kind,text){ return el('span','pill '+kind,text); }
+  function voteText(v,k){
+    var parts=[];
+    if(v.main==='y') parts.push('본강의 참석'); else if(v.main==='n') parts.push('본강의 불참');
+    if(v.makeup==='1') parts.push('보강 '+fmtD(k.mk[0]||''));
+    else if(v.makeup==='2') parts.push('보강 '+fmtD(k.mk[1]||''));
+    else if(v.makeup==='both') parts.push('보강 둘 다 가능');
+    else if(v.makeup==='n') parts.push('보강 안 감');
+    return parts.join(' · ');
+  }
+
+  // ---- 관리자: 대시보드 ----
+  function renderDash(){
+    var tr=trainees(), next=nextWeek();
+    var nResp=tr.filter(function(a){ return !!respOf(a.id); }).length;
+    var nPw=tr.filter(function(a){ return a.changed; }).length;
+    var kp=$('kpis'); kp.textContent='';
+    function kpi(val,label){ var k=el('div','kpi'); k.appendChild(el('b',null,val)); k.appendChild(el('span',null,label)); kp.appendChild(k); }
+    kpi(tr.length+'명','교육생');
+    kpi(nResp+' / '+tr.length,'사전 설문 제출');
+    kpi(nPw+' / '+tr.length,'비밀번호 설정 완료');
+    if(next){
+      var c=S.votes.counts[String(next.w)]||{y:0};
+      kpi(dday(next.d), next.w+'주차 · 참석 투표 '+c.y+'명');
+    }else kpi('끝','7주 과정 종료');
+
+    var td=$('dashTodo'); td.textContent='';
+    function todo(title,names,goV){
+      if(!names.length) return;
+      var b=el('div','free'); b.appendChild(el('b',null,title+' ('+names.length+'명)'));
+      b.appendChild(document.createTextNode(names.join(', ')));
+      if(goV){ b.style.cursor='pointer'; b.addEventListener('click',function(){ go(goV); }); }
+      td.appendChild(b);
+    }
+    todo('아직 로그인 안 한 교육생', tr.filter(function(a){ return !a.lastLogin; }).map(function(a){ return a.id; }),'a-members');
+    todo('사전 설문 안 낸 교육생', tr.filter(function(a){ return !respOf(a.id); }).map(function(a){ return a.id; }),'a-members');
+    todo('비밀번호가 잠긴 계정', S.admin.accounts.filter(function(a){ return a.locked; }).map(function(a){ return a.id; }),'a-members');
+    if(next){
+      var voted={}; S.admin.votes.forEach(function(v){ if(v.week===next.w && v.main) voted[v.by]=1; });
+      todo(next.w+'주차 참석 투표 안 한 교육생', tr.filter(function(a){ return !voted[a.id]; }).map(function(a){ return a.id; }),'a-weeks');
+    }
+    if(!S.me.changed){
+      var w=el('div','free'); w.appendChild(el('b',null,'관리자 비밀번호'));
+      w.appendChild(document.createTextNode('처음 비밀번호 그대로예요. 안전하게 "내 비밀번호"에서 바꿔 주세요.'));
+      w.style.cursor='pointer'; w.addEventListener('click',function(){ go('account'); }); td.appendChild(w);
+    }
+    if(!td.firstChild) td.appendChild(el('p','empty','지금은 챙길 일이 없어요. 👍'));
+    renderBars($('dashBars'),S.admin.responses);
+  }
+
+  // ---- 관리자: 교육생 목록 ----
+  function renderMembers(){
+    var accs=S.admin.accounts.slice().sort(function(a,b){ return (a.role===b.role)? 0 : (a.role==='t'? -1 : 1); });
+    $('memCount').textContent='교육생 '+trainees().length+'명 · 운영진 '+(accs.length-trainees().length)+'명';
+    var body=$('memBody'); body.textContent='';
+    accs.forEach(function(a){
+      var tr=el('tr');
+      var td1=el('td'); td1.appendChild(el('b',null,a.id)); tr.appendChild(td1);
+      tr.appendChild(el('td',null,a.role==='a'? '운영진':'교육생'));
+      var td3=el('td'); td3.appendChild(respOf(a.id)? pill('ok','제출') : pill('no','미제출')); tr.appendChild(td3);
+      var td4=el('td'); td4.appendChild(a.locked? pill('bad','잠김') : (a.changed? pill('ok','본인 설정') : pill('no','처음 그대로'))); tr.appendChild(td4);
+      tr.appendChild(el('td',null,a.attend.length+' / 7'));
+      tr.appendChild(el('td',null,fmtDT(a.lastLogin)||'아직 없음'));
+      var td7=el('td'); var b=el('button','rowbtn','관리'); b.type='button'; td7.appendChild(b); tr.appendChild(td7);
+      tr.addEventListener('click',function(){ openMember(a.id); });
+      body.appendChild(tr);
+    });
+  }
+  function setNewRole(r){ newRole=r; $('acRoleT').setAttribute('aria-pressed',r==='t'?'true':'false'); $('acRoleA').setAttribute('aria-pressed',r==='a'?'true':'false'); }
+  $('acRoleT').addEventListener('click',function(){ setNewRole('t'); });
+  $('acRoleA').addEventListener('click',function(){ setNewRole('a'); });
+  $('acAddBtn').addEventListener('click',function(){
+    var id=normId($('acNewName').value); hideMsg('acErr');
+    if(!id){ showMsg('acErr','이름을 적어 주세요.'); return; }
+    (async function(){
+      var pw=genPw(), h=await hashPw(id,pw);
+      var res=await act({action:'addAccount',id:id,role:newRole,newHash:h},{err:'acErr',btn:$('acAddBtn')});
+      if(res){
+        $('acNewName').value='';
+        var r=$('pwReveal'); r.textContent=id+' 님을 추가했어요.\n처음 비밀번호: '+pw+'\n이 번호는 지금만 보여요. 본인에게 알려 주세요.'; r.hidden=false;
+        window.scrollTo(0,0);
+      }
+    })();
+  });
+
+  // ---- 관리자: 교육생 한 명 ----
+  function memberAcc(){ var r=null; if(S && S.admin) S.admin.accounts.forEach(function(a){ if(a.id===adminMember) r=a; }); return r; }
+  function openMember(id){
+    adminMember=id;
+    var a=memberAcc(); if(!a) return;
+    $('mPhone').value=a.phone||''; $('mMemo').value=a.memo||''; $('mPw').value='';
+    $('mPwReveal').hidden=true; hideMsg('mPwErr'); hideMsg('mSaveOk'); hideMsg('mSaveErr'); hideMsg('mDelErr');
+    buildAttend(a.attend);
+    go('a-member');
+  }
+  function buildAttend(sel){
+    var box=$('mAttend'); box.textContent='';
+    for(var n=1;n<=7;n++){
+      var b=el('button','chip',n+'주'); b.type='button';
+      b.setAttribute('aria-pressed', sel.indexOf(n)>=0? 'true':'false');
+      b.addEventListener('click',function(){ this.setAttribute('aria-pressed', this.getAttribute('aria-pressed')==='true'? 'false':'true'); });
+      box.appendChild(b);
+    }
+  }
+  function renderMemberStatus(){
+    var a=memberAcc(); if(!a) return;
+    $('mName').textContent=a.id;
+    var bd=$('mBadges'); bd.textContent='';
+    bd.appendChild(pill(a.role==='a'? 'bad':'no', a.role==='a'? '운영진':'교육생'));
+    bd.appendChild(respOf(a.id)? pill('ok','설문 제출') : pill('no','설문 미제출'));
+    bd.appendChild(a.changed? pill('ok','비밀번호 본인 설정') : pill('no','처음 비밀번호 그대로'));
+    if(a.locked) bd.appendChild(pill('bad','잠김'));
+    bd.appendChild(pill('no','출석 '+a.attend.length+' / 7'));
+    $('mMeta').textContent='마지막 로그인: '+(fmtDT(a.lastLogin)||'아직 없음')+' · 비밀번호 바뀐 때: '+(fmtDT(a.updatedAt)||'-');
+    $('mPwStatus').textContent = a.locked? '비밀번호를 여러 번 틀려 잠겨 있어요. 잠금을 풀거나 새 비밀번호를 정해 주세요.' :
+      (a.changed? '본인이 직접 정한 비밀번호를 쓰고 있어요.' : '운영진이 준 처음 비밀번호 그대로예요. (처음 로그인하면 본인이 새로 정해요)');
+    $('mUnlockBtn').hidden=!a.locked;
+    var mv=$('mVotes'); mv.textContent='';
+    var vs=votesOf(a.id).filter(function(v){ return v.main||v.makeup; }).sort(function(x,y){ return x.week-y.week; });
+    if(!vs.length) mv.appendChild(el('p','empty','아직 투표한 것이 없어요.'));
+    vs.forEach(function(v){ var r=el('div','trow'); r.appendChild(el('span','ttime',v.week+'주차')); r.appendChild(el('span','ttext',voteText(v,wk(v.week)))); mv.appendChild(r); });
+    var mr=$('mResp'); mr.textContent='';
+    var resp=respOf(a.id);
+    if(resp) mr.appendChild(respBox(resp,false)); else mr.appendChild(el('p','empty','아직 설문을 내지 않았어요.'));
+    var db=$('mDelBox');
+    if(db.getAttribute('data-for')!==a.id){
+      db.textContent=''; db.setAttribute('data-for',a.id);
+      if(a.id===me.name) db.appendChild(el('p','empty','지금 로그인한 본인 계정은 삭제할 수 없어요.'));
+      else{
+        var del=sureBtn('이 회원 삭제',function(){
+          act({action:'delAccount',id:a.id},{err:'mDelErr'}).then(function(res){ if(res){ toast(a.id+' 님을 삭제했어요.'); go('a-members'); } else { db.removeAttribute('data-for'); renderMemberStatus(); } });
+        });
+        del.style.marginLeft='0'; db.appendChild(del);
+      }
+    }
+  }
+  async function setMemberPw(pw,btn){
+    var a=memberAcc(); if(!a) return;
+    hideMsg('mPwErr'); $('mPwReveal').hidden=true;
+    var h=await hashPw(a.id,pw);
+    var res=await act({action:'resetPw',id:a.id,newHash:h},{err:'mPwErr',btn:btn});
+    if(res){
+      $('mPw').value='';
+      if(a.id===me.name) loginHash=h;
+      var r=$('mPwReveal'); r.textContent=a.id+' 님의 새 비밀번호: '+pw+'\n이 번호는 지금만 보여요. 본인에게 알려 주세요.'; r.hidden=false;
+    }
+  }
+  $('mPwSetBtn').addEventListener('click',function(){
+    var pw=$('mPw').value.trim();
+    if(pw.length<6){ showMsg('mPwErr','6자 이상으로 적어 주세요.'); return; }
+    setMemberPw(pw,$('mPwSetBtn'));
+  });
+  $('mPwGenBtn').addEventListener('click',function(){ setMemberPw(genPw(),$('mPwGenBtn')); });
+  $('mUnlockBtn').addEventListener('click',function(){
+    act({action:'unlock',id:adminMember},{err:'mPwErr',btn:$('mUnlockBtn')}).then(function(res){ if(res) toast('잠금을 풀었어요.'); });
+  });
+  $('mSaveBtn').addEventListener('click',function(){
+    hideMsg('mSaveOk');
+    var attend=[]; $('mAttend').querySelectorAll('.chip').forEach(function(b,i){ if(b.getAttribute('aria-pressed')==='true') attend.push(i+1); });
+    act({action:'saveMember',id:adminMember,phone:$('mPhone').value.trim(),memo:$('mMemo').value.trim(),attend:attend},{err:'mSaveErr',btn:$('mSaveBtn')})
+      .then(function(res){ if(res) showMsg('mSaveOk'); });
+  });
+
+  // ---- 관리자: 강의 관리 ----
+  function buildAwChips(){
+    var box=$('awChips'); box.textContent='';
+    for(var i=0;i<=7;i++){ (function(n){
+      var b=el('button','chip', n===0? '공통 자료' : n+'주차'); b.type='button';
+      b.setAttribute('aria-pressed', n===adminWeek? 'true':'false');
+      b.addEventListener('click',function(){ adminWeek=n; buildAwChips(); fillAwForm(); renderAwSide(); });
+      box.appendChild(b);
+    })(i); }
+  }
+  function fillAwForm(){
+    var n=adminWeek;
+    $('awFormBox').hidden = n===0;
+    hideMsg('awOk'); hideMsg('awErr'); hideMsg('awLinkErr'); hideMsg('matErr');
+    if(n>0){
+      var k=wk(n);
+      $('awTitle').value=k.t; $('awDate').value=k.d; $('awTeacher').value=k.s; $('awPlace').value=k.place;
+      for(var i=0;i<5;i++) $('awItem'+i).value=k.items[i]||'';
+      $('awMk1').value=k.mk[0]||''; $('awMk2').value=k.mk[1]||'';
+      $('awMakeup').value=k.makeup||''; $('awEtc').value=k.etc||'';
+    }
+  }
+  function renderAwSide(){
+    var n=adminWeek;
+    $('awListHead').textContent=(n===0? '공통' : n+'주차')+' 자료 · 링크';
+    fillMats($('awList'),n,true,'아직 없어요.');
+    $('awVoteBox').hidden = n===0 || !(S && S.admin);
+    if(n===0 || !(S && S.admin)) return;
+    var k=wk(n), box=$('awVotes'); box.textContent='';
+    var vs=S.admin.votes.filter(function(v){ return v.week===n; });
+    function group(title,names){
+      box.appendChild(el('p','grp',title+' ('+names.length+'명)'));
+      box.appendChild(el('p','names',names.length? names.join(', ') : '없음'));
+    }
+    function who(fn){ return vs.filter(fn).map(function(v){ return v.by; }); }
+    group('본강의 참석', who(function(v){ return v.main==='y'; }));
+    group('본강의 불참', who(function(v){ return v.main==='n'; }));
+    var voted={}; vs.forEach(function(v){ if(v.main) voted[v.by]=1; });
+    group('아직 투표 안 함', trainees().filter(function(a){ return !voted[a.id]; }).map(function(a){ return a.id; }));
+    if(k.mk[0]) group('보강 '+fmtD(k.mk[0])+' 가능', who(function(v){ return v.makeup==='1'||v.makeup==='both'; }));
+    if(k.mk[1]) group('보강 '+fmtD(k.mk[1])+' 가능', who(function(v){ return v.makeup==='2'||v.makeup==='both'; }));
+    if(k.mk.length) group('보강 안 감', who(function(v){ return v.makeup==='n'; }));
+  }
+  $('awSaveBtn').addEventListener('click',function(){
+    var n=adminWeek; if(!n) return;
+    hideMsg('awOk'); hideMsg('awErr');
+    var data={t:$('awTitle').value.trim(), d:$('awDate').value, s:$('awTeacher').value.trim(), place:$('awPlace').value.trim(),
+      items:[0,1,2,3,4].map(function(i){ return $('awItem'+i).value.trim(); }),
+      mk:[$('awMk1').value,$('awMk2').value].filter(Boolean), makeup:$('awMakeup').value.trim(), etc:$('awEtc').value.trim()};
+    if(!data.t){ showMsg('awErr','강의명을 적어 주세요.'); return; }
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(data.d)){ showMsg('awErr','본강의 날짜를 골라 주세요.'); return; }
+    act({action:'saveWeek',week:n,data:data},{err:'awErr',btn:$('awSaveBtn')}).then(function(res){ if(res) showMsg('awOk'); });
+  });
+  $('awLinkBtn').addEventListener('click',function(){
+    var label=$('awLinkName').value.trim(), url=$('awLinkUrl').value.trim();
+    hideMsg('awLinkErr');
+    if(!url){ showMsg('awLinkErr','주소를 적어 주세요.'); return; }
+    if(!/^https?:\/\//i.test(url)) url='https://'+url;
+    url=url.replace(/^http:\/\//i,'https://');
+    if(!/^https:\/\/\S+\.\S+$/.test(url)){ showMsg('awLinkErr','주소 모양이 맞지 않아요. (예: https://naver.com)'); return; }
+    act({action:'addLink',week:adminWeek,label:label,url:url},{err:'awLinkErr',btn:$('awLinkBtn')}).then(function(res){ if(res){ $('awLinkName').value=''; $('awLinkUrl').value=''; } });
+  });
+  function readB64(file){
+    return new Promise(function(res,rej){
+      var fr=new FileReader();
+      fr.onload=function(){ var s=String(fr.result); res(s.slice(s.indexOf(',')+1)); };
+      fr.onerror=function(){ rej(new Error('read')); };
+      fr.readAsDataURL(file);
+    });
+  }
+  $('matUpBtn').addEventListener('click',function(){
+    var f=$('matFile').files[0];
+    hideMsg('matErr');
+    if(!f){ showMsg('matErr','먼저 파일을 골라 주세요.'); return; }
+    if(f.size>20*1024*1024){ showMsg('matErr','파일이 20MB보다 커요.'); return; }
+    var btn=$('matUpBtn'); btn.disabled=true; btn.textContent='올리는 중... (큰 파일은 조금 걸려요)';
+    (async function(){
+      try{
+        var b64=await readB64(f);
+        var res=await act({action:'addFile',week:adminWeek,name:$('matName').value.trim(),fname:f.name,mime:f.type||'application/octet-stream',b64:b64},{err:'matErr'});
+        if(res){ $('matName').value=''; $('matFile').value=''; toast('파일을 올렸어요.'); }
+      }catch(e){ showMsg('matErr','파일을 읽지 못했어요. 다시 해 주세요.'); }
+      btn.disabled=false; btn.textContent='파일 올리기';
+    })();
+  });
+
+  // ---- 관리자: 설문 응답 ----
+  function renderSurveyAdmin(){
+    var resp=S.admin.responses.slice().sort(function(a,b){return (b.updatedAt||'').localeCompare(a.updatedAt||'')});
+    $('respCount').textContent='응답 '+resp.length+'명';
+    renderBars($('topicBars'),resp);
+    var list=$('respList'); list.textContent='';
+    if(!resp.length){ list.appendChild(el('p','empty','교육생이 제출하면 여기에 한 명씩 쌓여요.')); return; }
+    resp.forEach(function(d){ list.appendChild(respBox(d,true)); });
+  }
+
+  // ---- 시작 ----
+  buildAwChips(); fillAwForm(); renderHome();
+  var t0=null; try{ t0=localStorage.getItem('team100_token'); }catch(e){}
+  $('bootRetry').addEventListener('click',function(){ location.reload(); });
+  if(t0){
+    token=t0;
+    var snap=null; try{ snap=JSON.parse(localStorage.getItem('team100_snap')||'null'); }catch(e){}
+    if(snap && snap.me && snap.me.role==='t' && snap.votes && Array.isArray(snap.materials)) applyData(snap,true);
+    else { booting=true; route(); }
+    api({action:'bootstrap'}).then(function(res){
+      var first=booting;
+      if(res.ok){ booting=false; applyData(res.data,first); return; }
+      if(res.error==='auth'){ booting=false; clearSession(); route(); return; }
+      if(first){ $('bootMsg').textContent='연결이 안 돼요. 인터넷을 확인하고 다시 눌러 주세요.'; $('bootRetry').hidden=false; }
+      else toast('최신 내용을 불러오지 못했어요. 인터넷을 확인해 주세요.');
+    });
+  }else route();
+})();
+</script>
+</body></html>
