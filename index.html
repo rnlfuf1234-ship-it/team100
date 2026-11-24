@@ -66,6 +66,9 @@ textarea{min-height:96px;resize:vertical}
 .okmsg{color:var(--ok);font-size:14px;font-weight:700;margin-top:8px;display:none}
 .warn{background:var(--accent-soft);color:var(--accent);border-radius:10px;padding:12px;font-size:14px;font-weight:700;margin-top:16px;white-space:pre-wrap}
 .badge-ex{font-size:12px;color:var(--sub)}
+.chip.wide{width:100%;box-sizing:border-box;border-radius:14px;text-align:left;font-weight:700}
+.chip.wide .badge-ex{display:block;font-weight:400;font-size:13px;margin-top:2px}
+.chip.wide[aria-pressed="true"] .badge-ex{color:var(--accent)}
 .login{text-align:center;padding:32px 20px;margin-top:28px}
 .login h1{font-size:26px;font-weight:900;margin:6px 0 8px}
 .login .lbl,.login input{text-align:left}
@@ -135,7 +138,7 @@ textarea{min-height:96px;resize:vertical}
 .pill.ok{background:var(--ok-soft);color:var(--ok)}
 .pill.no{background:var(--bg);color:var(--sub);border:1px solid var(--line)}
 .pill.bad{background:var(--accent-soft);color:var(--accent)}
-.names{font-size:14px;margin:2px 0 10px;word-break:keep-all}
+.names{font-size:14px;margin:2px 0 10px;word-break:keep-all;white-space:pre-wrap}
 
 /* ---- 관리자 콘솔 ---- */
 .adm-side{position:fixed;left:0;top:0;bottom:0;width:224px;background:var(--side);color:var(--side-fg);display:flex;flex-direction:column;
@@ -297,6 +300,12 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     <div id="vtMkBox">
       <p class="lbl" id="vtMkLbl">보강수업</p>
       <div class="chips-row" id="vtMk"></div>
+      <div id="vtEtcBox" hidden>
+        <label class="lbl" for="vtEtcText">올 수 있는 다른 날짜를 적어 주세요</label>
+        <input type="text" id="vtEtcText" maxlength="100" placeholder="예) 12월 5일(토) 저녁, 12월 7일(월) 오후">
+        <button type="button" class="btn sub" id="vtEtcBtn">이 날짜로 저장</button>
+        <p class="okmsg" id="vtEtcSaved" style="display:block" hidden></p>
+      </div>
       <p class="qhelp" id="vtMkCnt" style="margin:6px 0 0"></p>
     </div>
     <p class="err" id="vtErr"></p>
@@ -405,12 +414,31 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   </div>
   <div class="card">
     <span class="qnum">8</span>
+    <p class="qtitle">주 멘토를 한 분 골라 주세요</p>
+    <p class="qhelp">7주 동안 주로 도움받고 싶은 멘토예요. 멘토마다 맡은 수업이 달라요.</p>
+    <div class="chips" id="mentor" data-single>
+      <button type="button" class="chip wide" data-v="변해영">변해영 총괄코치 <span class="badge-ex">창업 · 정책자금 · 보험 (1·3·4주차)</span></button>
+      <button type="button" class="chip wide" data-v="권영휘">권영휘 본부장 코치 <span class="badge-ex">세무·노무 환급 · PR (2주차)</span></button>
+      <button type="button" class="chip wide" data-v="류귀렬">류귀렬 대표 <span class="badge-ex">벤처인증 · 정부지원 · IR · AX (5~7주차)</span></button>
+    </div>
+    <p class="err" id="errMentor">멘토를 한 분 골라 주세요.</p>
+    <div id="mentorAreaBox" hidden>
+      <p class="lbl" id="mentorAreaLbl">주로 받고 싶은 컨설팅 영역 (여러 개 가능)</p>
+      <div class="chips" id="mentorAreas"></div>
+      <input type="text" id="mentorEtc" placeholder="받고 싶은 영역을 적어 주세요" style="margin-top:10px" hidden>
+      <p class="err" id="errMentorAreas">영역을 1개 이상 골라 주세요.</p>
+      <label class="lbl" for="mentorNote">구체적으로 받고 싶은 내용 (선택)</label>
+      <textarea id="mentorNote" placeholder="예) 제조업 고객의 정책자금 상담을 같이 봐 주셨으면 해요" style="min-height:72px"></textarea>
+    </div>
+  </div>
+  <div class="card">
+    <span class="qnum">9</span>
     <p class="qtitle">지금 가장 큰 고민이나 궁금한 점</p>
     <p class="qhelp">자유롭게 적어 주세요. (선택)</p>
     <textarea id="worry" placeholder="예) 고객에게 정책자금 이야기를 어떻게 꺼내야 할지 모르겠어요"></textarea>
   </div>
   <div class="card">
-    <span class="qnum">9</span>
+    <span class="qnum">10</span>
     <p class="qtitle">1주차 10분 개인 상담에서 다루고 싶은 주제</p>
     <p class="qhelp">1주차에 1:1 상담 시간이 있어요. 미리 적어 주시면 맞춰서 준비할게요. (선택)</p>
     <textarea id="counsel" placeholder="예) 제 고객 중 제조업 대표님 사례를 상담받고 싶어요"></textarea>
@@ -629,7 +657,10 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
 <!-- ============ 관리자: 설문 응답 ============ -->
 <section id="view-a-survey" class="view">
   <div class="pg-head"><h2 class="pg">설문 응답</h2><span class="count-pill" id="respCount"></span></div>
-  <div class="card"><p class="qtitle sm">집중적으로 배우고 싶은 분야</p><div id="topicBars"></div></div>
+  <div class="grid2">
+    <div class="card"><p class="qtitle sm">집중적으로 배우고 싶은 분야</p><div id="topicBars"></div></div>
+    <div class="card"><p class="qtitle sm">주 멘토별 교육생</p><div id="mentorBox"></div></div>
+  </div>
   <div class="card" id="respList"></div>
 </section>
 
@@ -1039,42 +1070,71 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     renderVote(n);
     renderComments(n);
   }
+  var etcWeek=0;   // "기타 날짜 쓰기" 칸을 열어 둔 주차 (0 = 닫힘)
+  function myVote(n){ var m=(S && S.votes.mine[String(n)])||{}; return {main:m.main||'', makeup:m.makeup||'', note:m.note||''}; }
+  function sendVote(n,v){
+    var key=String(n), prev=S.votes.mine[key];
+    S.votes.mine[key]=v;                            // 누르자마자 화면에 먼저 반영하고, 서버 저장은 뒤에서
+    hideMsg('vtErr'); renderVote(n); renderHome();
+    api({action:'vote',week:n,main:v.main,makeup:v.makeup,note:v.note||''}).then(function(res){
+      if(res.ok){ applyData(res.data,false); return; }
+      if(!S) return;
+      if(prev) S.votes.mine[key]=prev; else delete S.votes.mine[key];
+      renderVote(n); renderHome(); showMsg('vtErr','투표가 저장되지 않았어요. '+errText(res));
+    });
+  }
   function renderVote(n){
-    var k=wk(n), mine=S.votes.mine[String(n)]||{main:'',makeup:''}, c=S.votes.counts[String(n)]||{y:0,n:0,m1:0,m2:0,mn:0};
+    if(etcWeek && etcWeek!==n) etcWeek=0;
+    var k=wk(n), mine=myVote(n), c=S.votes.counts[String(n)]||{};
+    function cnt(x){ return c[x]||0; }
     function chips(box,opts,cur,field){
       box.textContent='';
       opts.forEach(function(o){
         var b=el('button','chip',o[1]); b.type='button';
-        b.setAttribute('aria-pressed', cur===o[0]? 'true':'false');
+        b.setAttribute('aria-pressed', (cur===o[0] || (o[0]==='etc' && etcWeek===n))? 'true':'false');
         b.addEventListener('click',function(){
-          var v={main:mine.main||'', makeup:mine.makeup||''};
+          if(field==='makeup' && o[0]==='etc'){
+            if(etcWeek===n){ etcWeek=0; renderVote(n); return; }                              // 열어만 둔 칸 닫기
+            if(cur!=='etc'){ etcWeek=n; renderVote(n); $('vtEtcText').focus(); return; }      // 칸 열기 (저장은 아래 버튼으로)
+          }
+          etcWeek=0;
+          var v=myVote(n);
           v[field]=(cur===o[0])? '' : o[0];
-          var key=String(n), prev=S.votes.mine[key];
-          S.votes.mine[key]=v;                      // 누르자마자 화면에 먼저 반영하고, 서버 저장은 뒤에서
-          hideMsg('vtErr'); renderVote(n); renderHome();
-          api({action:'vote',week:n,main:v.main,makeup:v.makeup}).then(function(res){
-            if(res.ok){ applyData(res.data,false); return; }
-            if(!S) return;
-            if(prev) S.votes.mine[key]=prev; else delete S.votes.mine[key];
-            renderVote(n); renderHome(); showMsg('vtErr','투표가 저장되지 않았어요. '+errText(res));
-          });
+          if(field==='makeup') v.note='';
+          sendVote(n,v);
         });
         box.appendChild(b);
       });
     }
     $('vtMainLbl').textContent='본강의 · '+fmtD(k.d)+' 오후 1~6시';
     chips($('vtMain'),[['y','참석해요'],['n','못 가요']],mine.main,'main');
-    $('vtMainCnt').textContent='지금까지 참석 '+c.y+'명 · 불참 '+c.n+'명';
+    $('vtMainCnt').textContent='지금까지 참석 '+cnt('y')+'명 · 불참 '+cnt('n')+'명';
     $('vtMkBox').hidden=!k.mk.length;
     if(k.mk.length){
       $('vtMkLbl').textContent='보강수업'+(k.makeup? ' · '+k.makeup : '')+' — 올 수 있는 날';
       var opts=[['1',fmtD(k.mk[0])]];
       if(k.mk[1]){ opts.push(['2',fmtD(k.mk[1])]); opts.push(['both','둘 다 가능']); }
+      opts.push(['etc','기타 날짜 쓰기']);
       opts.push(['n','보강은 안 가요']);
       chips($('vtMk'),opts,mine.makeup,'makeup');
-      $('vtMkCnt').textContent=fmtD(k.mk[0])+' '+c.m1+'명'+(k.mk[1]? ' · '+fmtD(k.mk[1])+' '+c.m2+'명' : '')+' · 안 감 '+c.mn+'명';
+      var showEtc=(mine.makeup==='etc' || etcWeek===n);
+      $('vtEtcBox').hidden=!showEtc;
+      if(showEtc && document.activeElement!==$('vtEtcText')) $('vtEtcText').value=mine.note;
+      $('vtEtcSaved').hidden=!(mine.makeup==='etc' && mine.note);
+      $('vtEtcSaved').textContent='내가 적은 날짜: '+mine.note;
+      $('vtMkCnt').textContent=fmtD(k.mk[0])+' '+cnt('m1')+'명'+(k.mk[1]? ' · '+fmtD(k.mk[1])+' '+cnt('m2')+'명' : '')+' · 기타 날짜 '+cnt('me')+'명 · 안 감 '+cnt('mn')+'명';
     }
   }
+  function saveEtcVote(){
+    var n=curWeek(), text=$('vtEtcText').value.trim();
+    if(!n || !S) return;
+    if(!text){ showMsg('vtErr','가능한 날짜를 적어 주세요.'); return; }
+    var v=myVote(n); v.makeup='etc'; v.note=text.slice(0,100);
+    etcWeek=0; $('vtEtcText').blur();
+    sendVote(n,v);
+  }
+  $('vtEtcBtn').addEventListener('click',saveEtcVote);
+  $('vtEtcText').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); saveEtcVote(); } });
   function renderComments(n){
     var list=$('cmList'); list.textContent='';
     var rows=S.comments.filter(function(c){ return c.week===n; }).sort(function(a,b){ return (a.at||'').localeCompare(b.at||''); });
@@ -1113,10 +1173,32 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
       if(g.id==='job'){ $('jobEtc').hidden = chipVal('job')!=='기타'; }
       if(g.id==='topics'){ $('topicsEtc').hidden = chipVals('topics').indexOf('기타')<0; }
       if(g.id==='goals'){ $('goalsEtc').hidden = chipVals('goals').indexOf('기타')<0; }
+      if(g.id==='mentor' && !on){ buildMentorAreas(chipVal('mentor'),[],''); }
+      if(g.id==='mentorAreas'){ $('mentorEtc').hidden = chipVals('mentorAreas').indexOf('기타')<0; }
     });
   });
   document.querySelectorAll('.chips .chip').forEach(function(c){c.setAttribute('aria-pressed','false')});
-  function chipText(b){ return b.textContent.replace(/\([\d~]+주차\)/,'').trim(); }
+  function chipText(b){ var v=b.getAttribute('data-v'); return v!=null? v : b.textContent.replace(/\([\d~]+주차\)/,'').trim(); }
+  // 멘토별 담당 영역 (7주 커리큘럼의 담당 주차 기준)
+  var MENTORS={
+    '변해영':{title:'총괄코치', areas:['창업·법인 설립','정책자금','세금·절세 컨설팅','보험·클로징 화법','재무제표 진단']},
+    '권영휘':{title:'본부장 코치', areas:['세무 환급','노무 환급','실전 RP(상담 연습)','정책자금 영업 실무','PR·광고 소재']},
+    '류귀렬':{title:'대표', areas:['벤처인증','연구소 설립·관리','정부지원사업(PSST)','IR','AI·AX 활용(클로드)']}
+  };
+  function buildMentorAreas(name,selected,etc){
+    var m=MENTORS[name], box=$('mentorAreas');
+    box.textContent='';
+    $('mentorAreaBox').hidden=!m;
+    if(!m) return;
+    $('mentorAreaLbl').textContent=name+' '+m.title+'에게 주로 받고 싶은 컨설팅 영역 (여러 개 가능)';
+    m.areas.concat(['기타']).forEach(function(a){
+      var b=el('button','chip',a); b.type='button';
+      b.setAttribute('aria-pressed', selected.indexOf(a)>=0? 'true':'false');
+      box.appendChild(b);
+    });
+    $('mentorEtc').hidden=selected.indexOf('기타')<0;
+    $('mentorEtc').value=etc||'';
+  }
   function chipVal(id){ var b=document.querySelector('#'+id+' .chip[aria-pressed="true"]'); return b? chipText(b) : ''; }
   function chipVals(id){ return Array.prototype.map.call(document.querySelectorAll('#'+id+' .chip[aria-pressed="true"]'),chipText); }
   function withEtc(arr,etc){ etc=(etc||'').trim(); return arr.map(function(t){return t==='기타'&&etc? '기타: '+etc : t}); }
@@ -1127,6 +1209,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
       level:chipVal('level'), levelNote:$('levelNote').value.trim(),
       topics:withEtc(chipVals('topics'),$('topicsEtc').value),
       goals:withEtc(chipVals('goals'),$('goalsEtc').value),
+      mentor:chipVal('mentor'), mentorAreas:withEtc(chipVals('mentorAreas'),$('mentorEtc').value), mentorNote:$('mentorNote').value.trim(),
       worry:$('worry').value.trim(), counsel:$('counsel').value.trim()
     };
   }
@@ -1136,6 +1219,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     flag('errAge',!/^\d{1,3}$/.test(d.age)); flag('errGender',!d.gender);
     flag('errJob',!chipVal('job')); flag('errLevel',!d.level);
     flag('errTopics',d.topics.length===0); flag('errGoals',d.goals.length===0);
+    flag('errMentor',!d.mentor); flag('errMentorAreas',!!d.mentor && d.mentorAreas.length===0);
     $('errTop').style.display = ok?'none':'block';
     return ok;
   }
@@ -1145,6 +1229,8 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
       +(d.levelNote? '\n경험 내용: '+d.levelNote : '')
       +'\n배우고 싶은 분야: '+d.topics.join(', ')
       +'\n얻고 싶은 것: '+d.goals.join(', ')
+      +'\n주 멘토: '+d.mentor+'\n멘토에게 받고 싶은 영역: '+d.mentorAreas.join(', ')
+      +(d.mentorNote? '\n멘토에게 바라는 내용: '+d.mentorNote : '')
       +(d.worry? '\n고민/궁금한 점: '+d.worry : '')
       +(d.counsel? '\n개인 상담 주제: '+d.counsel : '');
   }
@@ -1200,6 +1286,13 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     }
     fillMulti('topics','topicsEtc',Array.isArray(d.topics)? d.topics : []);
     fillMulti('goals','goalsEtc',Array.isArray(d.goals)? d.goals : []);
+    if(d.mentor && MENTORS[d.mentor]){
+      setChip('mentor',[d.mentor]);
+      var mEtc='', mSel=(Array.isArray(d.mentorAreas)? d.mentorAreas : []).map(function(t){
+        if(typeof t==='string' && t.indexOf('기타')===0){ mEtc=t.replace(/^기타:?\s*/,''); return '기타'; } return t; });
+      buildMentorAreas(d.mentor,mSel,mEtc);
+      $('mentorNote').value=d.mentorNote||'';
+    }
     $('levelNote').value=d.levelNote||''; $('worry').value=d.worry||''; $('counsel').value=d.counsel||'';
   }
 
@@ -1259,7 +1352,10 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     (Array.isArray(d.goals)? d.goals : []).forEach(function(t){ var s=el('span','tag',String(t)); s.style.opacity='.65'; tags.appendChild(s); });
     box.appendChild(tags);
     function free(label,val){ if(!val) return; var w=el('div','free'); w.appendChild(el('b',null,label)); w.appendChild(document.createTextNode(String(val))); box.appendChild(w); }
-    free('컨설팅 경험 내용',d.levelNote); free('고민·궁금한 점',d.worry); free('개인 상담 주제',d.counsel);
+    free('컨설팅 경험 내용',d.levelNote);
+    if(d.mentor) free('주 멘토 · 받고 싶은 영역', d.mentor+' — '+((Array.isArray(d.mentorAreas)? d.mentorAreas : []).join(', ')||'(영역 선택 없음)'));
+    free('멘토에게 바라는 내용',d.mentorNote);
+    free('고민·궁금한 점',d.worry); free('개인 상담 주제',d.counsel);
     return box;
   }
   function pill(kind,text){ return el('span','pill '+kind,text); }
@@ -1269,6 +1365,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     if(v.makeup==='1') parts.push('보강 '+fmtD(k.mk[0]||''));
     else if(v.makeup==='2') parts.push('보강 '+fmtD(k.mk[1]||''));
     else if(v.makeup==='both') parts.push('보강 둘 다 가능');
+    else if(v.makeup==='etc') parts.push('보강 기타 날짜: '+(v.note||''));
     else if(v.makeup==='n') parts.push('보강 안 감');
     return parts.join(' · ');
   }
@@ -1466,7 +1563,12 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     group('아직 투표 안 함', trainees().filter(function(a){ return !voted[a.id]; }).map(function(a){ return a.id; }));
     if(k.mk[0]) group('보강 '+fmtD(k.mk[0])+' 가능', who(function(v){ return v.makeup==='1'||v.makeup==='both'; }));
     if(k.mk[1]) group('보강 '+fmtD(k.mk[1])+' 가능', who(function(v){ return v.makeup==='2'||v.makeup==='both'; }));
-    if(k.mk.length) group('보강 안 감', who(function(v){ return v.makeup==='n'; }));
+    if(k.mk.length){
+      var etc=vs.filter(function(v){ return v.makeup==='etc'; });
+      box.appendChild(el('p','grp','보강 기타 날짜를 적은 사람 ('+etc.length+'명)'));
+      box.appendChild(el('p','names', etc.length? etc.map(function(v){ return v.by+' — '+(v.note||''); }).join('\n') : '없음'));
+      group('보강 안 감', who(function(v){ return v.makeup==='n'; }));
+    }
   }
   $('awSaveBtn').addEventListener('click',function(){
     var n=adminWeek; if(!n) return;
@@ -1516,6 +1618,16 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     var resp=S.admin.responses.slice().sort(function(a,b){return (b.updatedAt||'').localeCompare(a.updatedAt||'')});
     $('respCount').textContent='응답 '+resp.length+'명';
     renderBars($('topicBars'),resp);
+    var mb=$('mentorBox'); mb.textContent='';
+    Object.keys(MENTORS).forEach(function(name){
+      var mine=resp.filter(function(d){ return d.mentor===name; });
+      mb.appendChild(el('p','grp',name+' '+MENTORS[name].title+' ('+mine.length+'명)'));
+      mb.appendChild(el('p','names', mine.length? mine.map(function(d){
+        return d.name+' — '+((Array.isArray(d.mentorAreas)? d.mentorAreas : []).join(', ')||'영역 선택 없음');
+      }).join('\n') : '아직 없음'));
+    });
+    var noMentor=resp.filter(function(d){ return !d.mentor || !MENTORS[d.mentor]; });
+    if(noMentor.length){ mb.appendChild(el('p','grp','멘토를 아직 고르지 않음 ('+noMentor.length+'명)')); mb.appendChild(el('p','names',noMentor.map(function(d){ return d.name; }).join(', '))); }
     var list=$('respList'); list.textContent='';
     if(!resp.length){ list.appendChild(el('p','empty','교육생이 제출하면 여기에 한 명씩 쌓여요.')); return; }
     resp.forEach(function(d){ list.appendChild(respBox(d,true)); });
