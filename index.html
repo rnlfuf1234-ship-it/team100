@@ -655,9 +655,9 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
       <input type="text" id="awItem3">
       <label class="lbl" for="awItem4">마무리 (5시~6시)</label>
       <input type="text" id="awItem4">
-      <label class="lbl" for="awMk1">보강 날짜 1</label>
+      <label class="lbl" for="awMk1">보강 날짜</label>
       <input type="date" id="awMk1">
-      <label class="lbl" for="awMk2">보강 날짜 2</label>
+      <label class="lbl" for="awMk2">보강 날짜 하나 더 (없으면 비워 두세요)</label>
       <input type="date" id="awMk2">
       <label class="lbl" for="awMakeup">보강 시간·장소</label>
       <input type="text" id="awMakeup">
@@ -803,29 +803,29 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   // ---- 7주 기본 커리큘럼 (원본 한글 파일 그대로. 관리자가 고치면 고친 내용이 우선) ----
   var TIMES=['1교시 · 1시~2시','2교시 · 2시~3시','티타임 · 3시~3시 30분','4교시 · 3시 30분~5시','마무리 · 5시~6시'];
   var TEA='신입을 위한 반복 학습 편성(커피챗)';
-  var MK='오후 6~9시 · 플레이업파트너스';
+  var MK='오전 10시부터';   // 보강수업 = 본강의 다음 주 토요일 오전 10시 (목·금 보강은 없앰)
   var WEEK_DEF=[
     {d:'2026-11-28',s:'변해영',t:'창업 컨설팅',place:'중기이코노미',
      items:['창업기업의 이해와 설립 (개인·법인, 창업 인정)','기업 기본 인프라 구축 (업종코드·연구소·고용)',TEA,'자금·인증 확보 / 고용증대 세액공제','성장·사옥 마련 전략 + Q&A'],
-     mk:['2026-12-03','2026-12-04'],makeup:MK,etc:'10분 개인 상담 면담'},
+     mk:['2026-12-05'],makeup:MK,etc:'10분 개인 상담 면담'},
     {d:'2026-12-05',s:'권영휘',t:'세무·노무 / PR 컨설팅',place:'중기이코노미',
      items:['기업환급컨설팅의 종류와 개념','노무환급 / 세무환급',TEA,'실전 RP','정책자금 영업과 실무 / Q&A'],
-     mk:['2026-12-10','2026-12-11'],makeup:MK,etc:'5명 선택하여 광고 소재 제작'},
+     mk:['2026-12-12'],makeup:MK,etc:'5명 선택하여 광고 소재 제작'},
     {d:'2026-12-12',s:'변해영',t:'정책자금 컨설팅',place:'중기이코노미',
      items:['정책자금 기관별 특징 (중진공·소진공·기보·신보)','정책자금 심화 — 심사·한도·부결 대응',TEA,'세금 컨설팅 — 급여대장 비과세·법인전환·벤처투자 절세','재무제표 진단 · 자금 사례 실습'],
-     mk:['2026-12-17','2026-12-18'],makeup:MK,etc:''},
+     mk:['2026-12-19'],makeup:MK,etc:''},
     {d:'2026-12-19',s:'변해영',t:'보험 컨설팅',place:'중기이코노미',
      items:['법인 설립 실무 / 클로징·화법','창업의 조건 – 3주차 연속 비과세 컨설팅',TEA,'보험 클로징 — 리스크 진단·임원 퇴직금','상담 화법 · 롤플레이 실습'],
-     mk:['2026-12-22','2026-12-23'],makeup:MK,etc:'6명 선택하여 광고 소재 제작'},
+     mk:['2026-12-26'],makeup:MK,etc:'6명 선택하여 광고 소재 제작'},
     {d:'2026-12-26',s:'류귀렬',t:'벤처인증 강의 기본 (연구소관리)',place:'중기이코노미',
      items:['벤처인증 기본교육','연구소 설립 / MOU / 출원',TEA,'사례 교육 : 더창 컴퍼니 AX 활용','사례 교육 : 기타 등'],
-     mk:['2026-12-30','2026-12-31'],makeup:MK,etc:''},
+     mk:['2027-01-02'],makeup:MK,etc:''},
     {d:'2027-01-02',s:'류귀렬',t:'정부지원 강의 기본 (클로드·AX)',place:'중기이코노미',
      items:['정부지원사업 카테고리','PSST사업 사례',TEA,'아이템 선정부터 결과물까지 현장지도 (그 자리에서 작성하는 것 보여주기 + 질의 응답)',''],
-     mk:['2027-01-07','2027-01-08'],makeup:MK,etc:''},
+     mk:['2027-01-09'],makeup:MK,etc:''},
     {d:'2027-01-09',s:'류귀렬',t:'IR 기본 · AX 기본',place:'중기이코노미',
      items:['IR이란 기본교육','워크북 타임 / AI 활용 제작 시범',TEA,'AX 목업 제작법 기본 IT강의','실제 실무'],
-     mk:['2027-01-14','2027-01-15'],makeup:MK,etc:'저녁식사 · 2기 재수강 모집'}
+     mk:['2027-01-16'],makeup:MK,etc:'저녁식사 · 2기 재수강 모집'}
   ];
   function wk(n){
     var def=WEEK_DEF[n-1], ov=(S && S.weeks && S.weeks['w'+n]) || {}, o={w:n};
@@ -1178,15 +1178,21 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     $('vtMainCnt').textContent='지금까지 참석 '+cnt('y')+'명 · 불참 '+cnt('n')+'명';
     $('vtMkBox').hidden=!k.mk.length;
     if(k.mk.length){
-      $('vtMkLbl').textContent='보강수업'+(k.makeup? ' · '+k.makeup : '')+' — 올 수 있는 날';
-      var opts=[['1',fmtD(k.mk[0])]];
-      if(k.mk[1]){ opts.push(['2',fmtD(k.mk[1])]); opts.push(['both','둘 다 가능']); }
+      var opts;
+      if(k.mk[1]){   // 보강 날짜가 둘일 때: 올 수 있는 날을 고른다
+        $('vtMkLbl').textContent='보강수업'+(k.makeup? ' · '+k.makeup : '')+' — 올 수 있는 날';
+        opts=[['1',fmtD(k.mk[0])],['2',fmtD(k.mk[1])],['both','둘 다 가능']];
+        $('vtMkCnt').textContent=fmtD(k.mk[0])+' '+cnt('m1')+'명 · '+fmtD(k.mk[1])+' '+cnt('m2')+'명 · 기타 날짜 '+cnt('me')+'명 · 안 감 '+cnt('mn')+'명';
+      }else{         // 보강 날짜가 하나일 때: 참석 여부만 고른다
+        $('vtMkLbl').textContent='보강수업 · '+fmtD(k.mk[0])+(k.makeup? ' '+k.makeup : '');
+        opts=[['1','보강 참석해요']];
+        $('vtMkCnt').textContent='지금까지 참석 '+cnt('m1')+'명 · 기타 날짜 '+cnt('me')+'명 · 안 감 '+cnt('mn')+'명';
+      }
       opts.push(['etc','기타 날짜 쓰기']);
       opts.push(['n','보강은 안 가요']);
       chips($('vtMk'),opts,d.makeup,'makeup');
       $('vtEtcBox').hidden=d.makeup!=='etc';
       if(d.makeup==='etc' && document.activeElement!==$('vtEtcText')) $('vtEtcText').value=d.note;
-      $('vtMkCnt').textContent=fmtD(k.mk[0])+' '+cnt('m1')+'명'+(k.mk[1]? ' · '+fmtD(k.mk[1])+' '+cnt('m2')+'명' : '')+' · 기타 날짜 '+cnt('me')+'명 · 안 감 '+cnt('mn')+'명';
     }else $('vtEtcBox').hidden=true;
     renderVoteState(n);
   }
@@ -1672,7 +1678,22 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
       mk:[$('awMk1').value,$('awMk2').value].filter(Boolean), makeup:$('awMakeup').value.trim(), etc:$('awEtc').value.trim()};
     if(!data.t){ showMsg('awErr','강의명을 적어 주세요.'); return; }
     if(!/^\d{4}-\d{2}-\d{2}$/.test(data.d)){ showMsg('awErr','본강의 날짜를 골라 주세요.'); return; }
-    act({action:'saveWeek',week:n,data:data},{err:'awErr',btn:$('awSaveBtn')}).then(function(res){ if(res) showMsg('awOk'); });
+    // 보강 날짜가 바뀌면 그 주차에 이미 낸 보강 투표는 뜻이 달라지므로 지운다 (본강의 투표는 그대로)
+    var mkChanged=JSON.stringify(data.mk)!==JSON.stringify(wk(n).mk);
+    var mkVotes=(S && S.admin)? S.admin.votes.filter(function(v){ return v.week===n && v.makeup; }).length : 0;
+    function send(){
+      act({action:'saveWeek',week:n,data:data,mkChanged:mkChanged},{err:'awErr',btn:$('awSaveBtn')}).then(function(res){
+        if(!res) return;
+        showMsg('awOk');
+        if(res.cleared) toast('보강 투표 '+res.cleared+'건을 지웠어요. 교육생에게 다시 투표해 달라고 알려 주세요.');
+      });
+    }
+    if(mkChanged && mkVotes){
+      showPopup({icon:'⚠️', title:'보강 날짜를 바꾸시겠어요?', body:'이 주차에 이미 낸 보강 투표 '+mkVotes+'건이 지워져요.\n교육생이 새 날짜로 다시 투표해야 해요. (본강의 투표는 그대로예요)',
+        ok:'바꾸고 보강 투표 지우기', alt:'취소', onOk:send});
+      return;
+    }
+    send();
   });
   $('awLinkBtn').addEventListener('click',function(){
     var label=$('awLinkName').value.trim(), url=$('awLinkUrl').value.trim();
@@ -1860,4 +1881,4 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   }else route();
 })();
 </script>
-<!-- build:20261124131012 --></body></html>
+<!-- build:20261126093102 --></body></html>
