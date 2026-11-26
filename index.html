@@ -600,6 +600,14 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     <div class="card"><p class="qtitle sm">📝 사전 설문 응답</p><div id="mResp"></div></div>
   </div>
   <div class="card">
+    <p class="qtitle sm">✏️ 이름(아이디) 바꾸기</p>
+    <p class="qhelp">이름을 잘못 적었을 때 써요. 설문·투표·댓글은 그대로 옮겨지고, 비밀번호는 새로 만들어져요. (아이디가 이름이라 비밀번호도 함께 바뀌어요)</p>
+    <input type="text" id="mNewName" placeholder="새 이름">
+    <button type="button" class="btn sub" id="mRenameBtn">이름 바꾸기</button>
+    <p class="warn" id="mRenameReveal" hidden></p>
+    <p class="err" id="mRenameErr"></p>
+  </div>
+  <div class="card">
     <p class="qtitle sm">회원 삭제</p>
     <p class="qhelp">삭제하면 이 사람은 로그인할 수 없고, 낸 설문 응답과 참석 투표도 함께 지워져요. 댓글은 남아요.</p>
     <div id="mDelBox"></div>
@@ -1551,6 +1559,7 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
     var a=memberAcc(); if(!a) return;
     $('mPhone').value=a.phone||''; $('mMemo').value=a.memo||''; $('mPw').value='';
     $('mPwReveal').hidden=true; hideMsg('mPwErr'); hideMsg('mSaveOk'); hideMsg('mSaveErr'); hideMsg('mDelErr');
+    $('mNewName').value=''; $('mRenameReveal').hidden=true; hideMsg('mRenameErr');
     buildAttend(a.attend);
     go('a-member');
   }
@@ -1614,6 +1623,24 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   $('mPwGenBtn').addEventListener('click',function(){ setMemberPw(genPw(),$('mPwGenBtn')); });
   $('mUnlockBtn').addEventListener('click',function(){
     act({action:'unlock',id:adminMember},{err:'mPwErr',btn:$('mUnlockBtn')}).then(function(res){ if(res) toast('잠금을 풀었어요.'); });
+  });
+  $('mRenameBtn').addEventListener('click',function(){
+    var a=memberAcc(); if(!a) return;
+    var newId=normId($('mNewName').value);
+    hideMsg('mRenameErr'); $('mRenameReveal').hidden=true;
+    if(!newId){ showMsg('mRenameErr','새 이름을 적어 주세요.'); return; }
+    if(newId===a.id){ showMsg('mRenameErr','지금 이름과 같아요.'); return; }
+    if(a.id===me.name){ showMsg('mRenameErr','지금 로그인한 본인 계정의 이름은 바꿀 수 없어요.'); return; }
+    showPopup({icon:'✏️', title:a.id+' → '+newId, body:'이름(아이디)을 바꿔요.\n설문·투표·댓글은 그대로 옮겨져요.\n비밀번호는 새로 만들어지니, 본인에게 새 아이디와 비밀번호를 알려 주세요.',
+      ok:'이름 바꾸기', alt:'취소', onOk:function(){
+        (async function(){
+          var pw=genPw(), h=await hashPw(newId,pw);
+          var res=await act({action:'renameAccount',id:a.id,newId:newId,newHash:h},{err:'mRenameErr',btn:$('mRenameBtn')});
+          if(!res) return;
+          adminMember=newId; $('mNewName').value=''; route();
+          var r=$('mRenameReveal'); r.textContent='이름을 바꿨어요.\n새 아이디: '+newId+'\n새 비밀번호: '+pw+'\n이 번호는 지금만 보여요. 본인에게 알려 주세요.'; r.hidden=false;
+        })();
+      }});
   });
   $('mSaveBtn').addEventListener('click',function(){
     hideMsg('mSaveOk');
@@ -1881,4 +1908,4 @@ body.adm .wrap{max-width:1080px;margin-left:224px;margin-right:0;padding:8px 28p
   }else route();
 })();
 </script>
-<!-- build:20261126093102 --></body></html>
+<!-- build:20261126093620 --></body></html>
